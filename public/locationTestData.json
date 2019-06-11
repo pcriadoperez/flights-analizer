@@ -1,0 +1,10 @@
+{
+    "locations" : [ {
+      "timestampMs" : "1488871632000",
+      "latitudeE7" : 407365438,
+      "longitudeE7" : -739958738,
+      "accuracy" : 69,
+      "velocity" : 0,
+      "altitude" : 67
+    }]
+}
