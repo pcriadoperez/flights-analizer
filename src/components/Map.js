@@ -183,7 +183,7 @@ class Map extends React.Component {
         </MapGL>
         {this.props.trips.length >0 &&
         <div>
-          <TimeChart data={this.props.trips} />
+          <TimeChart data={this.props.trips} time={this.state.sliderValue}/>
           <Typography id="label">{timestampToDate(this.state.sliderValue)}</Typography>
           <Fab color="primary" aria-label="Add" onClick={this._handlePlayClick}>
             <PlayCircleFilled />

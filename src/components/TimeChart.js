@@ -8,11 +8,12 @@ import {
   VerticalBarSeries,
   LineSeries,
   Crosshair,
-  VerticalRectSeries
+  Highlight
 } from 'react-vis';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import { derToJose } from 'ecdsa-sig-formatter';
 
 
 
@@ -32,11 +33,10 @@ export default class TimeChart extends React.Component {
    * @private
    */
   _formatCrosshairItems = values => {
-    const {series} = this.state;
     return values.map((v, i) => {
       return {
-        title: "Distance",
-        value: v.top
+        title: i===0 ? 'Trips' : 'Distance',
+        value: i===0 ? v.y : Math.round(v.y) + 'km'
       };
     });
   };
@@ -48,9 +48,10 @@ export default class TimeChart extends React.Component {
    * @private
    */
   _formatCrosshairTitle = values => {
+    let options = {  year: 'numeric', month: 'short' };
     return {
-      title: 'Trips',
-      value: values[0].left
+      title: (new Date(values[0].x)).toLocaleDateString('en-US', options),
+      value: null
     };
   };
   
@@ -61,45 +62,61 @@ export default class TimeChart extends React.Component {
   _mouseLeaveHandler = () => {
     this.setState({crosshairValues: []});
   };
+  _nearestXHandler = (val, {index}) => {
+    this.setState({crosshairValues: [val, this.lineData[index] ]});
+
+  }
+  _updateHighlightWidth = (time) => {
+
+  }
   render() {
-    let lineData = []
+    this.lineData = []
     let barData = []
     //bucket distance per month
     this.props.data.forEach(trip => {
-        if(lineData.length === 0 ) {
-            lineData.push({x:trip.to.date, y:trip.distance})
-            barData.push({x:trip.to.date, y:1})
+        if(this.lineData.length === 0 ) {
+            this.lineData.push({x:trip.to.date, y:0})
+            barData.push({x:trip.to.date, y:0})
         }
-        if(trip.to.date.getMonth() === lineData[lineData.length -1 ].x.getMonth()){
-            lineData[lineData.length-1].y +=trip.distance
+        //Fill empty months with zero
+        while(trip.to.date.getMonth() !== this.lineData[this.lineData.length -1 ].x.getMonth()){
+          let newDate = new Date(this.lineData[this.lineData.length -1 ].x)
+          newDate.setMonth(this.lineData[this.lineData.length -1 ].x.getMonth() + 1 )
+          this.lineData.push({x: newDate, y:0})
+          barData.push({x: newDate, y:0})
+        }
+        if(trip.to.date.getMonth() === this.lineData[this.lineData.length -1 ].x.getMonth()){
+            this.lineData[this.lineData.length-1].y +=trip.distance
             barData[barData.length -1].y +=1
         }
         else{
-            lineData.push({x:trip.to.date, y:trip.distance})
+            this.lineData.push({x:trip.to.date, y:trip.distance})
             barData.push({x:trip.to.date, y:1})
         }
     })
     //Convert Dates
-    lineData = lineData.map(e=>( {x:e.x.getTime(), y: e.y}))
+    this.lineData = this.lineData.map(e=>( {x:e.x.getTime(), y: e.y}))
     barData = barData.map(e=>({ x:e.x.getTime(), y: e.y}))
     let barDataMax = barData.reduce(function(a,v){
         if(a.y<v.y) return v
         else return a
     }).y
-    console.log(lineData)
+    console.log(this.props.data)
     console.log(barData)
+    console.log(this.props.time)
     return (
-        <XYPlot width={window.outerWidth - 50} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
+        <XYPlot width={window.outerWidth-50} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
           <VerticalGridLines />
           <HorizontalGridLines />
           <XAxis />
-          <LineSeries data={lineData} />
-          <VerticalRectSeries data={barData} onNearestX={this._nearestXHandler} yDomain={[barDataMax, 0]} yRange={[barDataMax,0]}/>
+          <VerticalBarSeries data={barData} onNearestX={this._nearestXHandler} yDomain={[0,barDataMax + 1]}/>
+          <LineSeries data={this.lineData} curve={'curveMonotoneX'}/>
           <Crosshair
               itemsFormat={this._formatCrosshairItems}
               titleFormat={this._formatCrosshairTitle}
               values={this.state.crosshairValues}
             />
+            <Highlight color="#829AE3" highlightWidth={400} highlightHeight={100} drag={false} enableY={false} />
         </XYPlot>
     );
   }
