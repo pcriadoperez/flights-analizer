@@ -13,6 +13,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core/styles';
 import 'react-vis/dist/style.css';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+
+
 
 
 const styles = {
@@ -134,6 +137,11 @@ class VerticalLinearStepper extends React.Component {
 }
 }
 
+function Maps({ match }) {
+  return(
+    <Route path={`${match.path}/:id`} component={Map} />
+  )
+  }
 
 class App extends React.Component {
   constructor(props){
@@ -145,13 +153,17 @@ class App extends React.Component {
   render(){
     const { classes } = this.props;
     return (
-      <Grid className={classes.root} container direction="column"  alignItems="stretch" >
-      <VerticalLinearStepper classes={classes}/>
-          <Grid item className={classes.row} >
-          
-          </Grid>
-            
-        </Grid>
+      <Router>
+         <Route path="/map" component={Maps} />
+            <Grid className={classes.root} container direction="column"  alignItems="stretch" >
+            <VerticalLinearStepper classes={classes}/>
+                <Grid item className={classes.row} >
+                
+                </Grid>
+                  
+              </Grid>
+        </Router>
+
     );
   }
 }

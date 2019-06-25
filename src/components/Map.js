@@ -10,6 +10,9 @@ import Fab from '@material-ui/core/Fab';
 import { PlayCircleFilled } from '@material-ui/icons';
 import TimeChart from './TimeChart'
 
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+
+
 
 
 
@@ -31,10 +34,10 @@ const initialViewState = {
 
 
 class Map extends React.Component {
-  
   constructor(props){
     super(props)
     this.state = {
+      downloading: true,
       viewport: {
         width: '100%',
         height: 600,
@@ -44,9 +47,26 @@ class Map extends React.Component {
         pitch: 30
       },
       loading : true,
+      data: this.props.trips,
       sliderValue: Number(this.props.trips[0].from.timestampMs),
       filteredData: this.props.trips
     };
+  }
+  componentDidMount() {
+    fire.firestore().collection(this.props.match.params.id).get().then(snapshot => {
+      let incomingData = []
+      snapshot.forEach(doc => {
+        incomingData.push(doc.data())
+        incomingData[incomingData.length -1].from.date = incomingData[incomingData.length -1].from.date.toDate()
+        incomingData[incomingData.length -1].to.date = incomingData[incomingData.length -1].to.date.toDate()
+        console.log(doc.id, '=>', doc.data());
+      });
+      console.log(incomingData)
+      this.setState({data: incomingData, filteredData: incomingData, sliderValue: Number(incomingData[0].from.timestampMs),downloading: false})
+    })
+    .catch(err => {
+      console.log('Error getting documents', err);
+    })
   }
   count = 0
   _handleSliderChange= (event, value) => {
@@ -88,7 +108,7 @@ class Map extends React.Component {
           return this._handleSliderChange('stop', this.state.sliderValue)
         }
         this.timer = setInterval(() => {
-          if(this.state.sliderValue<Number(this.props.trips[this.props.trips.length-1].to.timestampMs)){
+          if(this.state.sliderValue<Number(this.state.data[this.state.data.length-1].to.timestampMs)){
             //if(this.state.filteredData.length>0) this._flyTo(this.state.filteredData[this.state.filteredData.length-1].from.latitudeE7/1e7, this.state.filteredData[this.state.filteredData.length-1].from.longitudeE7/1e7)
             this._handleSliderChange('play', this.state.sliderValue + 200000000)
           }
@@ -103,7 +123,7 @@ class Map extends React.Component {
       setFilters = function(minTime, maxTime) {
         this.filters.minTime = minTime;
         this.filters.maxTime = maxTime;
-        let filteredData = this.props.trips.filter(d => Number(d.from.timestampMs) >= minTime && Number(d.to.timestampMs) <= maxTime)
+        let filteredData = this.state.data.filter(d => Number(d.from.timestampMs) >= minTime && Number(d.to.timestampMs) <= maxTime)
         if(filteredData.length === 0) filteredData = [{
           from:{accuracy: 0,
             altitude: 0,
@@ -125,82 +145,91 @@ class Map extends React.Component {
       }
       render() {
         const {viewport} = this.state;
-        return (
-          <div>
-          <MapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-            {...viewport}
-            onViewportChange={(viewport) => this.setState({viewport})}
-          >
-          <DeckGL
-          controller={true}
-          viewState={viewport}
-          layers={[
-            new ArcLayer({
-              data: this.state.filteredData,
-              strokeWidth: 900,
-              getSourcePosition: d =>[d.from.longitudeE7/ 1e7, d.from.latitudeE7/1e7],
-              getTargetPosition: d =>[d.to.longitudeE7/ 1e7, d.to.latitudeE7/1e7],
-              getSourceColor: x => [0, 0, 255],
-              getTargetColor: x => [0, 255, 0],
-              pickable: true,
-              // Update app state
-              onHover: info => this.setState({
-                hoveredObject: info.object,
-                pointerX: info.x,
-                pointerY: info.y
-              }),
-              autoHighlight: true
-            }),
-            new ScatterplotLayer({
-              id: "locations",
-              data: this.props.trips,
-              pickable: true,
-              opacity: 0.8,
-              filled: true,
-              radiusScale: 50,
-              radiusMinPixels: 1,
-              radiusMaxPixels: 600,
-              lineWidthMinPixels: 1,
-              getPosition: d => ([d.from.longitudeE7/ 1e7, d.from.latitudeE7/1e7]),
-              getRadius: d => 600,
-              getFillColor: d => [255, 140, 0],
-              getLineColor: d => [0, 0, 0]})
-          ]}
-        >
-         { this._renderTooltip() }
-        <ScatterplotLayer id='scatterplot-layer' pickable={true}
-    opacity={0.8}
-    filled={true}
-    radiusScale={6}
-    radiusMinPixels={1}
-    radiusMaxPixels={100}
-    lineWidthMinPixel={1}
-    getPosition={d => [0,0]}
-    getRadius={d => Math.sqrt(d.exits)}
-    getFillColor={d => [255, 140, 0]}
-    getLineColor={d => [0, 0, 0]} />
-        </DeckGL>
-        </MapGL>
-        {this.props.trips.length >0 &&
-        <div>
-          <TimeChart data={this.props.trips} time={this.state.sliderValue}/>
-          <Typography id="label">{timestampToDate(this.state.sliderValue)}</Typography>
-          <Fab color="primary" aria-label="Add" onClick={this._handlePlayClick}>
-            <PlayCircleFilled />
-          </Fab>
-        <Slider
-          value={this.state.sliderValue}
-          min={Number(this.props.trips[0].from.timestampMs)}
-          max={Number(this.props.trips[this.props.trips.length-1].from.timestampMs)}
-          aria-labelledby="label"
-          onChange={this._handleSliderChange}
-        />
-        <Dashboard trips={this.state.filteredData} />
-        </div>
-          }
-        
-        </div>
-          )    
+        if (this.state.downloading){
+          return(
+            <div> Downloading Data.. </div>
+          )
+        }
+        else {
+          return (
+            <div>
+             <MapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
+               {...viewport}
+               onViewportChange={(viewport) => this.setState({viewport})}
+             >
+             <DeckGL
+             controller={true}
+             viewState={viewport}
+             layers={[
+               new ArcLayer({
+                 data: this.state.filteredData,
+                 strokeWidth: 900,
+                 getSourcePosition: d =>[d.from.longitudeE7/ 1e7, d.from.latitudeE7/1e7],
+                 getTargetPosition: d =>[d.to.longitudeE7/ 1e7, d.to.latitudeE7/1e7],
+                 getSourceColor: x => [0, 0, 255],
+                 getTargetColor: x => [0, 255, 0],
+                 pickable: true,
+                 // Update app state
+                 onHover: info => this.setState({
+                   hoveredObject: info.object,
+                   pointerX: info.x,
+                   pointerY: info.y
+                 }),
+                 autoHighlight: true
+               }),
+               new ScatterplotLayer({
+                 id: "locations",
+                 data: this.state.data,
+                 pickable: true,
+                 opacity: 0.8,
+                 filled: true,
+                 radiusScale: 50,
+                 radiusMinPixels: 1,
+                 radiusMaxPixels: 600,
+                 lineWidthMinPixels: 1,
+                 getPosition: d => ([d.from.longitudeE7/ 1e7, d.from.latitudeE7/1e7]),
+                 getRadius: d => 600,
+                 getFillColor: d => [255, 140, 0],
+                 getLineColor: d => [0, 0, 0]})
+             ]}
+           >
+            { this._renderTooltip() }
+           <ScatterplotLayer id='scatterplot-layer' pickable={true}
+       opacity={0.8}
+       filled={true}
+       radiusScale={6}
+       radiusMinPixels={1}
+       radiusMaxPixels={100}
+       lineWidthMinPixel={1}
+       getPosition={d => [0,0]}
+       getRadius={d => Math.sqrt(d.exits)}
+       getFillColor={d => [255, 140, 0]}
+       getLineColor={d => [0, 0, 0]} />
+           </DeckGL>
+           </MapGL>
+           {this.state.data.length >0 &&
+           <div>
+             <TimeChart data={this.state.data} time={this.state.sliderValue}/>
+             <Typography id="label">{timestampToDate(this.state.sliderValue)}</Typography>
+             <Fab color="primary" aria-label="Add" onClick={this._handlePlayClick}>
+               <PlayCircleFilled />
+             </Fab>
+           <Slider
+             value={this.state.sliderValue}
+             min={Number(this.state.data[0].from.timestampMs)}
+             max={Number(this.state.data[this.state.data.length-1].from.timestampMs)}
+             aria-labelledby="label"
+             onChange={this._handleSliderChange}
+           />
+           <Dashboard trips={this.state.filteredData} />
+           </div>
+             }
+           
+           </div>
+           
+           )   
+        }
+         
       }
 }
 
