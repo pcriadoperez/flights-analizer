@@ -7,6 +7,7 @@ import ReactDOMServer from 'react-dom/server';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import  {tripDistance, timestampToDate} from './Dashboard'
 import TextField from '@material-ui/core/TextField';
+import {Redirect} from 'react-router-dom'
 
 var crg = require('city-reverse-geocoder');
 var tzlookup = require("tz-lookup");
@@ -148,7 +149,8 @@ const styles = theme => ({
         fullname: '',
         files: [],
         data:undefined,
-        name: ''
+        name: '',
+        uploadComplete:false
       }
       this._handleNameChange = this._handleNameChange.bind(this);
     }
@@ -176,7 +178,7 @@ const styles = theme => ({
       processing: null,
       uploadprogress: null,
       sending: null,
-      success: null,
+      success: this.onUploadSuccessHandler,
       complete: null,
       canceled: null,
       maxfilesreached: null,
@@ -186,11 +188,13 @@ const styles = theme => ({
       reset: null,
       queuecomplete: null
     }
+    onUploadSuccessHandler = e => this.setState({uploadComplete: true}) 
     _updateInput = e => {
       this.setState({
         [e.target.name]: e.target.value
       });
     }
+
     handleClose() {
       this.setState({
           open: false
@@ -229,7 +233,8 @@ const styles = theme => ({
       />
           <DropzoneComponent config={componentConfig}
           eventHandlers={this.eventHandlers} djsConfig={this.djsConfig} 
-           /></div>}               
+           /></div>}
+           {this.state.uploadComplete === true && <Redirect push to={"/map/"+this.state.name} />}         
          
       </div>
         )}

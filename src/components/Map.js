@@ -9,8 +9,8 @@ import Grid from '@material-ui/core/Grid'
 import Fab from '@material-ui/core/Fab';
 import { PlayCircleFilled } from '@material-ui/icons';
 import TimeChart from './TimeChart'
+import loading from '../Assets/dancing.gif'
 
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 
 
@@ -147,7 +147,10 @@ class Map extends React.Component {
         const {viewport} = this.state;
         if (this.state.downloading){
           return(
-            <div> Downloading Data.. </div>
+            <div> 
+              <div>Downloading Data.. </div>
+              <img src={require('../Assets/dancing.gif')} alt="loading..." />
+              </div>
           )
         }
         else {
