@@ -8,10 +8,10 @@ const styles  ={
     card: {
       width: 275,
       padding: 10,
-      height: 200
-    },
+      height: 275
+        },
     title: {
-      fontSize: 14,
+      fontSize: 60,
     },
     pos: {
       margin: 12,
@@ -20,18 +20,18 @@ const styles  ={
 
 class DashboardCard extends React.Component{
     render(){
-        const { classes } = this.props;
+        var { classes } = this.props;
         return (
-            <Card className={classes.card}>
+            <Card className={classes.card} style={{backgroundColor: this.props.color, width: this.props.width ? this.props.width :classes.card.width }}>
               <CardContent>
           {this.props.icon && <img src={this.props.icon} alt='' /> }
-                <Typography variant="h5" component="h2">
+                <Typography variant="h5" component="h2" style={{color: this.props.color ? 'white' : 'black'}}>
                   {this.props.title}
                 </Typography>
-                <Typography variant="body2" component="p">
+                <Typography variant="h3" component="p" style={{color: this.props.color ? 'white' : 'black'}}>
                   {this.props.data}
                 </Typography>
-                <Typography variant="body2" component="p" color="textSecondary">
+                <Typography variant="h3" component="p" color="textSecondary" style={{color: this.props.color ? 'white' : 'black'}}>
                   {this.props.unit}
                 </Typography>
                 {this.props.children}

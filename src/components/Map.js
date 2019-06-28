@@ -13,12 +13,6 @@ import 'react-sharingbuttons/dist/main.css'
 import { Facebook } from 'react-sharingbuttons'
 
 
-
-
-
-
-
-
 var name = 'Pablo'
 
 // Set your mapbox access token here
@@ -71,6 +65,9 @@ class Map extends React.Component {
     })
   }
   count = 0
+  _interpolate = (value, first, last ) => {
+    return ((value-first)/(last-first)) *255
+  }
   _handleSliderChange= (event, value) => {
     if(event == "stop"){
       clearInterval(this.timer)
@@ -150,10 +147,15 @@ class Map extends React.Component {
         const {viewport} = this.state;
         if (this.state.downloading){
           return(
-            <div> 
+            <Grid container
+            spacing={0}
+            direction="column"
+            alignItems="center"
+            justify="center"
+            style={{ minHeight: '100vh' }}> 
               <img src={require('../Assets/dancing.gif')} alt="loading..." />
               <div>Downloading Data.. </div>
-            </div>
+            </Grid>
           )
         }
         else {
@@ -172,8 +174,8 @@ class Map extends React.Component {
                  strokeWidth: 900,
                  getSourcePosition: d =>[d.from.longitudeE7/ 1e7, d.from.latitudeE7/1e7],
                  getTargetPosition: d =>[d.to.longitudeE7/ 1e7, d.to.latitudeE7/1e7],
-                 getSourceColor: x => [0, 0, 255],
-                 getTargetColor: x => [0, 255, 0],
+                 getSourceColor: x => [0, 255, this._interpolate(Number(x.to.timestampMs),  Number(this.state.data[0].to.timestampMs), Number(this.state.data[this.state.data.length-1].to.timestampMs))],
+                 getTargetColor: x => [0, 150, this._interpolate(Number(x.to.timestampMs),  Number(this.state.data[0].to.timestampMs), Number(this.state.data[this.state.data.length-1].to.timestampMs))],
                  pickable: true,
                  // Update app state
                  onHover: info => this.setState({
