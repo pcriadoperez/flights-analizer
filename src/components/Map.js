@@ -9,7 +9,9 @@ import Grid from '@material-ui/core/Grid'
 import Fab from '@material-ui/core/Fab';
 import { PlayCircleFilled } from '@material-ui/icons';
 import TimeChart from './TimeChart'
-import loading from '../Assets/dancing.gif'
+import 'react-sharingbuttons/dist/main.css'
+import { Facebook } from 'react-sharingbuttons'
+
 
 
 
@@ -104,16 +106,17 @@ class Map extends React.Component {
         });
       }
       _handlePlayClick = (e)=> {
+        let sliderRange = Number(this.state.data[this.state.data.length-1].from.timestampMs) - Number(this.state.data[0].from.timestampMs)
         if(this.timer) {
           return this._handleSliderChange('stop', this.state.sliderValue)
         }
         this.timer = setInterval(() => {
           if(this.state.sliderValue<Number(this.state.data[this.state.data.length-1].to.timestampMs)){
             //if(this.state.filteredData.length>0) this._flyTo(this.state.filteredData[this.state.filteredData.length-1].from.latitudeE7/1e7, this.state.filteredData[this.state.filteredData.length-1].from.longitudeE7/1e7)
-            this._handleSliderChange('play', this.state.sliderValue + 200000000)
+            this._handleSliderChange('play', this.state.sliderValue + sliderRange/300)
           }
           else{
-            this._handleSliderChange('stop', this.state.sliderValue + 200000000)
+            this._handleSliderChange('stop', this.state.sliderValue + sliderRange/300)
           }
       }, 100)
       }
@@ -148,9 +151,9 @@ class Map extends React.Component {
         if (this.state.downloading){
           return(
             <div> 
-              <div>Downloading Data.. </div>
               <img src={require('../Assets/dancing.gif')} alt="loading..." />
-              </div>
+              <div>Downloading Data.. </div>
+            </div>
           )
         }
         else {
@@ -225,6 +228,7 @@ class Map extends React.Component {
              onChange={this._handleSliderChange}
            />
            <Dashboard trips={this.state.filteredData} />
+           <Facebook url={'https://facebook.com'} />
            </div>
              }
            

@@ -3,6 +3,7 @@ import DashboardCard from './DashboardCard'
 import Grid from '@material-ui/core/Grid';
 import HorizontalSeries from './HorizontalSeries'
 import { bboxes } from 'ngeohash';
+import clockIcon from '../Assets/time.png'
 
 
 const co2perkm = 0.189655172
@@ -69,9 +70,11 @@ class Dashboard extends React.Component{
             alignItems="flex-start"
           >
             <DashboardCard title="Trips" data={this.props.trips.length} unit="trips" />
-          <DashboardCard title="First Trip: " data={timestampToDate(Number(this.props.trips[0].to.timestampMs))} />
-          <DashboardCard title="Last Trip: " data= {timestampToDate(Number(this.props.trips[this.props.trips.length-1].to.timestampMs))}/>
-          <DashboardCard title="CO2: " data={Math.round(km*co2perkm/1000)} unit="tons"/>
+          <DashboardCard icon={clockIcon} title="First Trip: " data={timestampToDate(Number(this.props.trips[0].to.timestampMs))} />
+          <DashboardCard icon={clockIcon} title="Last Trip: " data= {timestampToDate(Number(this.props.trips[this.props.trips.length-1].to.timestampMs))}/>
+        <DashboardCard title="CO2: " data={Math.round(km*co2perkm/1000)} unit="tons">
+        <a href='https://www.terrapass.com/product/productindividuals-families' >Offset your Carbon Footprint</a>
+        </DashboardCard>
           <DashboardCard title="Trees to plant: " data={Math.round(km*co2perkm/7.25748)} unit="Trees" />
           <DashboardCard title="Distance: " data={Math.round(km)} unit="kms" />
           <DashboardCard title="Average trip: " data={Math.round(km/this.props.trips.length)} unit="kms" />

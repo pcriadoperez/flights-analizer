@@ -7,13 +7,14 @@ import Typography from '@material-ui/core/Typography';
 const styles  ={
     card: {
       width: 275,
-      padding: 10
+      padding: 10,
+      height: 200
     },
     title: {
       fontSize: 14,
     },
     pos: {
-      marginBottom: 12,
+      margin: 12,
     },
   }
 
@@ -23,6 +24,7 @@ class DashboardCard extends React.Component{
         return (
             <Card className={classes.card}>
               <CardContent>
+          {this.props.icon && <img src={this.props.icon} alt='' /> }
                 <Typography variant="h5" component="h2">
                   {this.props.title}
                 </Typography>
@@ -32,6 +34,7 @@ class DashboardCard extends React.Component{
                 <Typography variant="body2" component="p" color="textSecondary">
                   {this.props.unit}
                 </Typography>
+                {this.props.children}
               </CardContent>
             </Card>
           );

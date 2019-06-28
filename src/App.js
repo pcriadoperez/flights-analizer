@@ -15,6 +15,8 @@ import { withStyles } from '@material-ui/core/styles';
 import 'react-vis/dist/style.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
+import instructions from './Assets/instructions.gif'
+
 
 
 
@@ -92,13 +94,16 @@ class VerticalLinearStepper extends React.Component {
     const steps = getSteps();
   return (
     <div className={classes.root}>
+    
       <Stepper activeStep={this.state.activeStep} orientation="vertical">
         {steps.map((label, index) => (
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
               <Typography>{getStepDescription(index)}</Typography>
-              { index=== 0 && <a href="https://takeout.google.com/settings/takeout" target="_blank">Download from Google Takeoot </a>}
+              { index=== 0 && <div><a href="https://takeout.google.com/settings/takeout" target="_blank">Download from Google Takeoot </a>
+              <img src={instructions} style={{width:500}} alt="instructions" />
+              </div>}
               { index===1 && <Uploader onDataChange={d => this.setState({trips: d})} onDone={e => this.setState({activeStep:  this.state.activeStep + 1})}/> }
               { index===2 && <Map trips={this.state.trips}/> }
               <div className={classes.actionsContainer}>
