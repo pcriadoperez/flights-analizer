@@ -6,6 +6,8 @@ import DropzoneComponent from 'react-dropzone-component';
 import ReactDOMServer from 'react-dom/server';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import  {tripDistance, timestampToDate} from './Dashboard'
+import TextField from '@material-ui/core/TextField';
+import {Redirect} from 'react-router-dom'
 
 var crg = require('city-reverse-geocoder');
 var tzlookup = require("tz-lookup");
@@ -35,9 +37,35 @@ function tripSpeed(trip){
   return(trip.distance / ((trip.to.date - trip.from.date )/3600000))
 }
 
+function uploadToDB(array, name){
+  array.forEach(element => fire.firestore().collection(name).doc(element.to.timestampMs).set(element))
+}
+
+const CssTextField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: 'white',
+    },
+    '& .MuiInput-underline:after': {
+      borderBottomColor: 'white',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'white',
+      },
+      '&:hover fieldset': {
+        borderColor: 'white',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'white',
+      },
+    },
+  },
+})(TextField);
 
 var oboe = require('oboe')
 let oboejs = new oboe()
+var name
 var updatedArcs = []
 oboejs.node('locations.*', function( location ){
   if(!location.hasOwnProperty('latitudeE7' ) || !location.hasOwnProperty('longitudeE7')) return oboe.drop()
@@ -62,6 +90,7 @@ return oboe.drop()
   updatedArcs.shift()
   console.log(updatedArcs)
   self.props.onDataChange(updatedArcs)
+  uploadToDB(updatedArcs, name)
 })
 .fail(function() {
   console.log('Location History Stream failed')
@@ -75,6 +104,8 @@ const styles = theme => ({
       display: 'none',
     },
   });
+
+ 
   
   function parseJSONFile ( file, oboeInstance ) {
     var fileSize = file.size;
@@ -116,11 +147,10 @@ const styles = theme => ({
     chunkReaderBlock( offset, chunkSize, file );
   }
   class Uploader extends React.Component {
-   
     djsConfig = {
       maxFilesize:1000,
       accept: function ( file, done ) {
-        parseJSONFile(file , oboejs )
+        parseJSONFile(file ,  oboejs )
       },
       previewTemplate: ReactDOMServer.renderToStaticMarkup(
         <div className="dz-preview dz-file-preview">
@@ -138,8 +168,15 @@ const styles = theme => ({
         percentLoaded: 0,
         fullname: '',
         files: [],
-        data:undefined
+        data:undefined,
+        name: '',
+        uploadComplete:false
       }
+      this._handleNameChange = this._handleNameChange.bind(this);
+    }
+    _handleNameChange(event){
+      name = event.target.value
+      this.setState({name: event.target.value})
     }
     eventHandlers = {
       // This one receives the dropzone object as the first parameter
@@ -161,7 +198,7 @@ const styles = theme => ({
       processing: null,
       uploadprogress: null,
       sending: null,
-      success: null,
+      success: this.onUploadSuccessHandler,
       complete: null,
       canceled: null,
       maxfilesreached: null,
@@ -171,11 +208,13 @@ const styles = theme => ({
       reset: null,
       queuecomplete: null
     }
+    onUploadSuccessHandler = e => this.setState({uploadComplete: true}) 
     _updateInput = e => {
       this.setState({
         [e.target.name]: e.target.value
       });
     }
+
     handleClose() {
       this.setState({
           open: false
@@ -189,23 +228,32 @@ const styles = theme => ({
     }
       reader.readAsBinaryString(this.state.files[0])
   }
-  handleSave(files) {
-    //Saving files to state for further use and closing Modal.
-    this.setState({
-        files: files, 
-        open: false
-    });
-}      
+  
+    
+    handleSave(files) {
+      //Saving files to state for further use and closing Modal.
+      this.setState({
+          files: files, 
+          open: false
+      });
+    }      
       render(){
         this.eventHandlers.complete = this.props.onDone
         return (
       <div>
         
          {(this.state.percentLoaded != 100 && this.state.percentLoaded != 0) ?
-          <LinearProgress variant="determinate" value={this.state.percentLoaded }/> :<div>
+          <LinearProgress variant="determinate" value={this.state.percentLoaded }/> :
+          <div>
+            <CssTextField id="custom-css-standard-input"  label="Name your map"
+        value={this.state.name}
+        onChange={this._handleNameChange}
+        margin="normal"
+      />
           <DropzoneComponent config={componentConfig}
           eventHandlers={this.eventHandlers} djsConfig={this.djsConfig} 
-           /></div>}               
+           /></div>}
+           {this.state.uploadComplete === true && <Redirect push to={"/map/"+this.state.name} />}         
          
       </div>
         )}
