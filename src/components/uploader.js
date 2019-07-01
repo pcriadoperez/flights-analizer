@@ -41,6 +41,27 @@ function uploadToDB(array, name){
   array.forEach(element => fire.firestore().collection(name).doc(element.to.timestampMs).set(element))
 }
 
+const CssTextField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: 'white',
+    },
+    '& .MuiInput-underline:after': {
+      borderBottomColor: 'white',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'white',
+      },
+      '&:hover fieldset': {
+        borderColor: 'white',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'white',
+      },
+    },
+  },
+})(TextField);
 
 var oboe = require('oboe')
 let oboejs = new oboe()
@@ -126,7 +147,6 @@ const styles = theme => ({
     chunkReaderBlock( offset, chunkSize, file );
   }
   class Uploader extends React.Component {
-   
     djsConfig = {
       maxFilesize:1000,
       accept: function ( file, done ) {
@@ -225,11 +245,10 @@ const styles = theme => ({
          {(this.state.percentLoaded != 100 && this.state.percentLoaded != 0) ?
           <LinearProgress variant="determinate" value={this.state.percentLoaded }/> :
           <div>
-            <TextField id="outlined-name" label="Name your map"
+            <CssTextField id="custom-css-standard-input"  label="Name your map"
         value={this.state.name}
         onChange={this._handleNameChange}
         margin="normal"
-        variant="outlined"
       />
           <DropzoneComponent config={componentConfig}
           eventHandlers={this.eventHandlers} djsConfig={this.djsConfig} 

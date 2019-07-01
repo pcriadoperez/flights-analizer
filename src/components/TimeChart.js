@@ -105,18 +105,18 @@ export default class TimeChart extends React.Component {
     console.log(barData)
     console.log(this.props.time)
     return (
-        <XYPlot width={window.outerWidth-50} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
+        <XYPlot margin={{left: 0, right: 10, top: 10, bottom: 30}} width={window.outerWidth-100} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
           <VerticalGridLines />
           <HorizontalGridLines />
           <XAxis />
-          <VerticalBarSeries data={barData} onNearestX={this._nearestXHandler} yDomain={[0,barDataMax + 1]}/>
-          <LineSeries data={this.lineData} curve={'curveMonotoneX'}/>
+          <VerticalBarSeries color='#4C9FFE' data={barData} onNearestX={this._nearestXHandler} yDomain={[0,barDataMax + 1]}/>
+          <LineSeries color='#FFCB23' data={this.lineData} curve={'curveMonotoneX'}/>
           <Crosshair
               itemsFormat={this._formatCrosshairItems}
               titleFormat={this._formatCrosshairTitle}
               values={this.state.crosshairValues}
+              color='#1E3CA0'
             />
-            <Highlight color="#829AE3" highlightWidth={400} highlightHeight={100} drag={false} enableY={false} />
         </XYPlot>
     );
   }

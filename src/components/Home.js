@@ -12,7 +12,8 @@ const styles = {
       flexGrow:1
       },
       sideMenu: {
-          backgroundColor: 'tan'     
+          backgroundColor: '#4C9FFE',
+          color: 'white'   
         },
       video: {
         minWidth: '100%',
@@ -36,12 +37,14 @@ class Home extends React.Component {
             <video className={classes.video} muted={true} loop={true} autoPlay={true} src={require('../Assets/example.mp4')} type="video/mp4"></video>
             </Grid>
             <Grid item className={classes.sideMenu} xs={12} s={4} md={3} xl={2}>
-            <Grid container direction="column" justify="center" alignItems="center" >
-                <div> First click this link to download your Location History from Google </div>
+            <Grid style={{padding:10, fontColor:'white'}} container direction="column" justify="center" alignItems="center" >
+                <h1>Create a map using your Google Location </h1>
+                <h3> First click this link to download your Location History from Google. Here is an image to help you how </h3>
                 <a href="https://takeout.google.com/settings/takeout" target="_blank">Download from Google Takeoot </a>
                 <img className={classes.image} src={instructions} alt="instructions" />
-                <div> Don't worry we value your privacy and won't share this information with anyone </div>
+                <h3> Then upload your data here. Don't worry we value your privacy and won't share this information with anyone and you can delete it anytime</h3>
                 <Uploader onDataChange={d => this.setState({trips: d})} onDone={e => this.setState({activeStep:  this.state.activeStep + 1})}/>
+                <a className="bmc-button" target="_blank" href="https://www.buymeacoffee.com/pablito"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"/><span style={{marginLeft: '5px'}}>Buy me a coffee</span></a>
             </Grid>
             </Grid>
     </Grid>

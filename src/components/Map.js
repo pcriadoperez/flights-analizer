@@ -6,11 +6,14 @@ import Dashboard, {tripDistance, timestampToDate} from './Dashboard'
 import Slider from '@material-ui/lab/Slider';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid'
-import Fab from '@material-ui/core/Fab';
-import { PlayCircleFilled } from '@material-ui/icons';
 import TimeChart from './TimeChart'
 import 'react-sharingbuttons/dist/main.css'
 import { Facebook } from 'react-sharingbuttons'
+import { Route, Redirect } from 'react-router'
+import {ReactComponent as PlayButton} from '../Assets/play-button.svg'
+import {ReactComponent as PauseButton} from '../Assets/pause.svg'
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+
 
 
 var name = 'Pablo'
@@ -27,7 +30,28 @@ const initialViewState = {
   bearing: 0
 };
 
-
+const CustomSlider = withStyles({
+  root: {
+    color: '#4C9FFE',
+    height: 6,
+  },
+  thumb: {
+    backgroundColor: '#fff',
+    border: '2px solid currentColor',
+    '&:focus,&:hover,&$active': {
+      boxShadow: 'inherit',
+    },
+  },
+  track: {
+    backgroundColor:'#4C9FFE',
+    height: 6,
+    borderRadius: 3,
+  },
+  rail: {
+    height: 6,
+    borderRadius: 3,
+  },
+})(Slider);
 
 class Map extends React.Component {
   constructor(props){
@@ -43,6 +67,7 @@ class Map extends React.Component {
         pitch: 30
       },
       loading : true,
+      redirect: false,
       data: this.props.trips,
       sliderValue: Number(this.props.trips[0].from.timestampMs),
       filteredData: this.props.trips
@@ -64,6 +89,7 @@ class Map extends React.Component {
       console.log('Error getting documents', err);
     })
   }
+  delete
   count = 0
   _interpolate = (value, first, last ) => {
     return ((value-first)/(last-first)) *255
@@ -80,7 +106,7 @@ class Map extends React.Component {
     const {hoveredObject, pointerX, pointerY} = this.state || {};
     return hoveredObject && (
       <div style={{position: 'absolute', zIndex: 1, pointerEvents: 'none', left: pointerX, top: pointerY}}>
-        <p>Time: { timestampToDate(hoveredObject.from.timestampMs)} </p>
+        <p>{ timestampToDate(hoveredObject.from.timestampMs)} </p>
         <p>km: { Math.round(hoveredObject.distance )}</p>
       </div>
     );
@@ -102,6 +128,19 @@ class Map extends React.Component {
           }
         });
       }
+      _handleClickDelete = (e) =>{
+          var deleteFn = fire.functions().httpsCallable('recursiveDelete');
+          deleteFn({ path: this.props.match.params.id })
+              .then(function(result) {
+                  console.log('Delete success: ' + JSON.stringify(result));
+                  this.setState({redirect: true})
+              })
+              .catch(function(err) {
+                  console.log('Delete failed, see console,');
+                  console.warn(err);
+                  alert('Ups, failed to delete, please try again or reach out to support')
+              });
+      }
       _handlePlayClick = (e)=> {
         let sliderRange = Number(this.state.data[this.state.data.length-1].from.timestampMs) - Number(this.state.data[0].from.timestampMs)
         if(this.timer) {
@@ -110,10 +149,10 @@ class Map extends React.Component {
         this.timer = setInterval(() => {
           if(this.state.sliderValue<Number(this.state.data[this.state.data.length-1].to.timestampMs)){
             //if(this.state.filteredData.length>0) this._flyTo(this.state.filteredData[this.state.filteredData.length-1].from.latitudeE7/1e7, this.state.filteredData[this.state.filteredData.length-1].from.longitudeE7/1e7)
-            this._handleSliderChange('play', this.state.sliderValue + sliderRange/300)
+            this._handleSliderChange('play', this.state.sliderValue + Math.round(sliderRange/300))
           }
           else{
-            this._handleSliderChange('stop', this.state.sliderValue + sliderRange/300)
+            this._handleSliderChange('stop', this.state.sliderValue + Math.round(sliderRange/300))
           }
       }, 100)
       }
@@ -145,6 +184,7 @@ class Map extends React.Component {
       }
       render() {
         const {viewport} = this.state;
+        if (this.state.redirect) return <Redirect to="/" />
         if (this.state.downloading){
           return(
             <Grid container
@@ -217,23 +257,40 @@ class Map extends React.Component {
            </MapGL>
            {this.state.data.length >0 &&
            <div>
+             <Grid style={{marginLeft:20, marginRight:20, marginTop:5, marginBottom:10}} container direction="row" justify="space-between" alignItems="center">
+               {this.timer ? <PauseButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} />:
+               <PlayButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} /> }
+             <Grid>
              <TimeChart data={this.state.data} time={this.state.sliderValue}/>
              <Typography id="label">{timestampToDate(this.state.sliderValue)}</Typography>
-             <Fab color="primary" aria-label="Add" onClick={this._handlePlayClick}>
-               <PlayCircleFilled />
-             </Fab>
-           <Slider
+              <CustomSlider
              value={this.state.sliderValue}
-             min={Number(this.state.data[0].from.timestampMs)}
-             max={Number(this.state.data[this.state.data.length-1].from.timestampMs)}
+             min={Number(this.state.data[0].to.timestampMs)}
+             max={Number(this.state.data[this.state.data.length-1].to.timestampMs)}
              aria-labelledby="label"
              onChange={this._handleSliderChange}
-           />
+              />
+             </Grid>
+          </Grid>
            <Dashboard trips={this.state.filteredData} />
-           <Facebook url={'https://facebook.com'} />
+           <Grid container direction="row" justify="center" alignItems="center" >
+            <div> Share my map: </div>
+            <div>
+            <Facebook url={'https://facebook.com'} />
+            </div>
+           </Grid>
+           <Grid container direction="row" justify="center" alignItems="center" >
+           <div>Did you like this page?   </div>
+           <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/pablito"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"/><span style={{marginLeft: '5px'}}>Buy me a coffee</span></a>
+           </Grid>
+           <Grid container direction="row" justify="center" alignItems="center" >
+           <div>
+             Don't want this page anymore: <a href="/" onClick={this._handleClickDelete}> Delete this map</a>
+           </div>
+
+             </Grid>
            </div>
              }
-           
            </div>
            
            )   

@@ -36,7 +36,7 @@ export default class HorizontalSeries extends React.Component {
           <HorizontalGridLines />
           <XAxis />
           <YAxis/>
-          <HorizontalBarSeries data={this.props.data} onNearestXY={value => this.setState({value})}/>
+          <HorizontalBarSeries color='#4C9FFE' data={this.props.data} onNearestXY={value => this.setState({value})}/>
           {this.state.value ? <Hint value={this.state.value} /> : null}
         </XYPlot>
         </CardContent>

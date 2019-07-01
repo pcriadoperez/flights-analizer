@@ -21,10 +21,11 @@ const styles  ={
 class DashboardCard extends React.Component{
     render(){
         var { classes } = this.props;
+        const Icon = this.props.icon
         return (
             <Card className={classes.card} style={{backgroundColor: this.props.color, width: this.props.width ? this.props.width :classes.card.width }}>
               <CardContent>
-          {this.props.icon && <img src={this.props.icon} alt='' /> }
+                {this.props.icon && <Icon style={{width:100, height:100, fill:this.props.color ? 'white' : 'black'}} />}
                 <Typography variant="h5" component="h2" style={{color: this.props.color ? 'white' : 'black'}}>
                   {this.props.title}
                 </Typography>
