@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-var firebase_tools = require('firebase-tools');
+//var firebase_tools = require('firebase-tools');
 
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 /*
@@ -65,6 +65,8 @@ exports.addToBigQuery = functions.storage.object().onFinalize(async (object) => 
  * 
  * @param {string} data.path the document or collection path to delete.
  */
+
+ /*
 exports.recursiveDelete = functions
 .runWith({
   timeoutSeconds: 540,
@@ -100,3 +102,4 @@ exports.recursiveDelete = functions
       };
     });
 });
+*/

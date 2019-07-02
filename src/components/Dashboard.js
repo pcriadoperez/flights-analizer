@@ -59,8 +59,12 @@ class Dashboard extends React.Component{
         var cities = {}
         var countries = {}
         var km = 0
+        var longestTrip = 0
         this.props.trips.forEach(function(trip){
             km += trip.distance
+            if (trip.distance > longestTrip) {
+              longestTrip= trip.distance
+            }
             if(cities.hasOwnProperty(trip.from.city[0].region)) cities[trip.from.city[0].region] += 1
             else cities[trip.from.city[0].region] = 1
             if(countries.hasOwnProperty(trip.from.city[0].country)) countries[trip.from.city[0].country] += 1
@@ -85,13 +89,14 @@ class Dashboard extends React.Component{
             <DashboardCard icon={Aeroplane} title="Trips" data={this.props.trips.length} unit="trips" color='#4C9FFE'  />
             <DashboardCard icon={ClockIcon} title="First Trip: " data={timestampToDate(Number(this.props.trips[0].to.timestampMs))} />
           <DashboardCard icon={ClockIcon} title="Last Trip: " data= {timestampToDate(Number(this.props.trips[this.props.trips.length-1].to.timestampMs))} color='#1E3CA0'/>
-        <DashboardCard icon={Co2} title="CO2: " data={Math.round(km*co2perkm/1000)} unit="tons" width={412} color='#FFCB23'>
+        <DashboardCard icon={Co2} title="CO2: " data={Math.round(km*co2perkm/1000)} unit="tons" color='#FFCB23'>
         <a href='https://www.terrapass.com/product/productindividuals-families' >Offset your Carbon Footprint</a>
         </DashboardCard>
           <DashboardCard icon={Trees} title="Trees to plant: " data={Math.round(km*co2perkm/7.25748)} unit="Trees" />
           <DashboardCard icon={Distance} title="Distance: " data={Math.round(km)} unit="kms" color='#1E3CA0' />
-          <DashboardCard title="Average trip: " data={Math.round(km/this.props.trips.length)} unit="kms" color='#FFCB23'/>
-          <DashboardCard icon={World} title="Around the world: " data={Math.round(km/40074)} unit="times"  width={412} color='#4C9FFE'/>
+          <DashboardCard icon={Distance}  title="Average trip: " data={Math.round(km/this.props.trips.length)} unit="kms" color='#FFCB23'/>
+          <DashboardCard icon={Distance} title="Longest trip: " data={Math.round(longestTrip)} unit="kms" />
+          <DashboardCard icon={World} title="Around the world: " data={Math.round(km/40074)} unit="times"  color='#4C9FFE'/>
           <DashboardCard title="You travel on average every " data={Math.round(averageTimeBetweenFlights)} unit="days" />
           {(Date.now()-Number(this.props.trips[this.props.trips.length-1].to.timestampMs))/86400000-averageTimeBetweenFlights>0 ?
              <DashboardCard icon={Event} title="You normally would have taken a trip "data={Math.round((Date.now()-Number(this.props.trips[this.props.trips.length-1].to.timestampMs))/86400000-averageTimeBetweenFlights)} unit="days ago"/>

@@ -30,7 +30,7 @@ export default class HorizontalSeries extends React.Component {
       <Card>
           <CardContent>
           <Typography variant="h5" component="h2">{this.props.title}</Typography>
-        <XYPlot width={window.outerWidth - 200} height={this.props.data.length * 25+50}
+        <XYPlot width={555} height={225}
         margin={{left:maxLabelLength*8+10}} yType={'ordinal'}  onMouseLeave={() => this.setState({value: false})}>
           <VerticalGridLines />
           <HorizontalGridLines />

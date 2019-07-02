@@ -5,6 +5,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.switch-wrapper {
+  position: relative;
+}
+
+.switch-wrapper > div {
+  position: absolute;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;

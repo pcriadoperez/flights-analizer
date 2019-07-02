@@ -6,7 +6,6 @@ import DropzoneComponent from 'react-dropzone-component';
 import ReactDOMServer from 'react-dom/server';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import  {tripDistance, timestampToDate} from './Dashboard'
-import TextField from '@material-ui/core/TextField';
 import {Redirect} from 'react-router-dom'
 
 var crg = require('city-reverse-geocoder');
@@ -41,27 +40,7 @@ function uploadToDB(array, name){
   array.forEach(element => fire.firestore().collection(name).doc(element.to.timestampMs).set(element))
 }
 
-const CssTextField = withStyles({
-  root: {
-    '& label.Mui-focused': {
-      color: 'white',
-    },
-    '& .MuiInput-underline:after': {
-      borderBottomColor: 'white',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: 'white',
-      },
-      '&:hover fieldset': {
-        borderColor: 'white',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: 'white',
-      },
-    },
-  },
-})(TextField);
+
 
 var oboe = require('oboe')
 let oboejs = new oboe()
@@ -148,15 +127,17 @@ const styles = theme => ({
   }
   class Uploader extends React.Component {
     djsConfig = {
-      maxFilesize:1000,
+      maxFilesize:2000,
       accept: function ( file, done ) {
         parseJSONFile(file ,  oboejs )
       },
       previewTemplate: ReactDOMServer.renderToStaticMarkup(
+        <div style={{border: 'black', borderWidth:'thin', borderStyle: 'dashed'}}>
         <div className="dz-preview dz-file-preview">
           <div className="dz-details">
           </div>
           <div className="dz-progress"><span className="dz-upload" data-dz-uploadprogress="true"></span></div>
+        </div>
         </div>
       )
     }
@@ -169,15 +150,10 @@ const styles = theme => ({
         fullname: '',
         files: [],
         data:undefined,
-        name: '',
         uploadComplete:false
       }
-      this._handleNameChange = this._handleNameChange.bind(this);
     }
-    _handleNameChange(event){
-      name = event.target.value
-      this.setState({name: event.target.value})
-    }
+    
     eventHandlers = {
       // This one receives the dropzone object as the first parameter
       // and can be used to additional work with the dropzone.js
@@ -209,11 +185,6 @@ const styles = theme => ({
       queuecomplete: null
     }
     onUploadSuccessHandler = e => this.setState({uploadComplete: true}) 
-    _updateInput = e => {
-      this.setState({
-        [e.target.name]: e.target.value
-      });
-    }
 
     handleClose() {
       this.setState({
@@ -238,18 +209,14 @@ const styles = theme => ({
       });
     }      
       render(){
+        name = this.props.name
         this.eventHandlers.complete = this.props.onDone
         return (
       <div>
-        
          {(this.state.percentLoaded != 100 && this.state.percentLoaded != 0) ?
           <LinearProgress variant="determinate" value={this.state.percentLoaded }/> :
           <div>
-            <CssTextField id="custom-css-standard-input"  label="Name your map"
-        value={this.state.name}
-        onChange={this._handleNameChange}
-        margin="normal"
-      />
+            
           <DropzoneComponent config={componentConfig}
           eventHandlers={this.eventHandlers} djsConfig={this.djsConfig} 
            /></div>}

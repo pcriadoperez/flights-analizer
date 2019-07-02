@@ -23,8 +23,19 @@ export default class TimeChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          crosshairValues: []
+          crosshairValues: [],
+          width: window.innerWidth-100
         }
+      }
+      componentDidMount(){
+        window.addEventListener('resize', this._resize)
+        this._resize()
+      }
+      componentWillUnmount() {
+        window.removeEventListener('resize', this._resize);
+      }
+      _resize = () => {
+        this.setState({width:window.innerWidth - 120})
       }
       /**
    * A callback to format the crosshair items.
@@ -105,7 +116,7 @@ export default class TimeChart extends React.Component {
     console.log(barData)
     console.log(this.props.time)
     return (
-        <XYPlot margin={{left: 0, right: 10, top: 10, bottom: 30}} width={window.outerWidth-100} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
+        <XYPlot margin={{left: 10, right: 10, top: 10, bottom: 30}} width={this.state.width} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
           <VerticalGridLines />
           <HorizontalGridLines />
           <XAxis />

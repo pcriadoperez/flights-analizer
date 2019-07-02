@@ -13,6 +13,8 @@ import { Route, Redirect } from 'react-router'
 import {ReactComponent as PlayButton} from '../Assets/play-button.svg'
 import {ReactComponent as PauseButton} from '../Assets/pause.svg'
 import { withStyles, makeStyles } from '@material-ui/core/styles';
+import {withRouter} from 'react-router-dom';
+
 
 
 
@@ -59,8 +61,8 @@ class Map extends React.Component {
     this.state = {
       downloading: true,
       viewport: {
-        width: '100%',
-        height: 600,
+        width: window.innerWidth-20,
+        height: window.innerHeight-150,
         latitude: 0,
         longitude: 0,
         zoom: 1,
@@ -74,6 +76,10 @@ class Map extends React.Component {
     };
   }
   componentDidMount() {
+    //Add listener to resize map onresize window
+    window.addEventListener('resize', this._resize);
+    this._resize();
+    //Download data
     fire.firestore().collection(this.props.match.params.id).get().then(snapshot => {
       let incomingData = []
       snapshot.forEach(doc => {
@@ -88,6 +94,15 @@ class Map extends React.Component {
     .catch(err => {
       console.log('Error getting documents', err);
     })
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._resize);
+  }
+  _resize = () => {
+    this._onViewportChange({
+      width: window.innerWidth-20,
+      height: window.innerHeight-150
+    });
   }
   delete
   count = 0
@@ -200,7 +215,12 @@ class Map extends React.Component {
         }
         else {
           return (
-            <div>
+            <Grid
+  container
+  direction="column"
+  justify="flex-start"
+  alignItems="center"
+>
              <MapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
                {...viewport}
                onViewportChange={(viewport) => this.setState({viewport})}
@@ -257,7 +277,7 @@ class Map extends React.Component {
            </MapGL>
            {this.state.data.length >0 &&
            <div>
-             <Grid style={{marginLeft:20, marginRight:20, marginTop:5, marginBottom:10}} container direction="row" justify="space-between" alignItems="center">
+             <Grid style={{marginLeft:20, marginRight:20, marginTop:5, marginBottom:10}} container direction="row" justify="center" alignItems="center">
                {this.timer ? <PauseButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} />:
                <PlayButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} /> }
              <Grid>
@@ -273,26 +293,25 @@ class Map extends React.Component {
              </Grid>
           </Grid>
            <Dashboard trips={this.state.filteredData} />
-           <Grid container direction="row" justify="center" alignItems="center" >
-            <div> Share my map: </div>
+           <Grid style={{margin:10}} container direction="row" justify="center" alignItems="center" >
+            <h5> Share my map: </h5>
             <div>
-            <Facebook url={'https://facebook.com'} />
+            <Facebook url={window.location.href} />
             </div>
            </Grid>
            <Grid container direction="row" justify="center" alignItems="center" >
-           <div>Did you like this page?   </div>
+           <h5>Did you like this page?   </h5>
            <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/pablito"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"/><span style={{marginLeft: '5px'}}>Buy me a coffee</span></a>
            </Grid>
            <Grid container direction="row" justify="center" alignItems="center" >
-           <div>
+           <h5>
              Don't want this page anymore: <a href="/" onClick={this._handleClickDelete}> Delete this map</a>
-           </div>
+           </h5>
 
              </Grid>
            </div>
              }
-           </div>
-           
+           </Grid>
            )   
         }
          
@@ -316,4 +335,4 @@ Map.defaultProps = {
 }
 
   
-export default Map
+export default withRouter(Map)
