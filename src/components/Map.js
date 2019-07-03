@@ -82,7 +82,7 @@ class Map extends React.Component {
         incomingData.push(doc.data())
         incomingData[incomingData.length -1].from.date = incomingData[incomingData.length -1].from.date.toDate()
         incomingData[incomingData.length -1].to.date = incomingData[incomingData.length -1].to.date.toDate()
-        console.log(doc.id, '=>', doc.data());
+        //console.log(doc.id, '=>', doc.data());
       });
       console.log(incomingData)
       if(incomingData.length === 0 ) this.setState({redirect: true})
@@ -163,11 +163,11 @@ class Map extends React.Component {
         }
         this.timer = setInterval(() => {
           if(this.state.sliderValue<Number(this.state.data[this.state.data.length-1].to.timestampMs)){
-            if(this.state.filteredData.length>0) this._flyTo(this.state.filteredData[this.state.filteredData.length-1].from.latitudeE7/1e7, this.state.filteredData[this.state.filteredData.length-1].from.longitudeE7/1e7,30,Math.max(1, Math.min(3,Math.round(14000/this.state.filteredData[this.state.filteredData.length-1].distance))))
-            this._handleSliderChange('play', this.state.sliderValue + Math.round(sliderRange/300))
+            if(this.state.filteredData.length>0) this._flyTo(this.state.filteredData[this.state.filteredData.length-1].from.latitudeE7/1e7, this.state.filteredData[this.state.filteredData.length-1].from.longitudeE7/1e7,30,Math.max(1, Math.min(3,Math.round(9000/this.state.filteredData[this.state.filteredData.length-1].distance))))
+            this._handleSliderChange('play', this.state.sliderValue + Math.round(sliderRange/200))
           }
           else{
-            this._handleSliderChange('stop', this.state.sliderValue + Math.round(sliderRange/300))
+            this._handleSliderChange('stop', this.state.sliderValue + Math.round(sliderRange/200))
             this._flyTo(0,0,30,1)
           }
       }, 100)
@@ -215,7 +215,7 @@ class Map extends React.Component {
           )
         }
         else {
-          console.log('ReRender Map')
+          //console.log('ReRender Map')
           return (
             <Grid container direction="column" justify="flex-start" alignItems="center">
             <div style={{backgroundColor:'white', width:this.state.viewport.width, height:this.state.viewport.height}}/>
@@ -297,10 +297,12 @@ class Map extends React.Component {
            <h5>
              Feel free to reach out: hi@wherehaveibeenintheworld.com
            </h5>
-           <div>Sources:</div>
+           <Grid style={{fontSize: '0.83em'}} container direction='column' justify='center' alignItems='center'>
+           <h5>Sources for calculations:</h5>
            <a href='https://www.carbonindependent.org/sources_aviation.html' target='_blank'>https://www.carbonindependent.org/sources_aviation.html</a>
            <a href='https://ec.europa.eu/clima/policies/transport/vehicles/cars_en' target='_blank'>https://ec.europa.eu/clima/policies/transport/vehicles/cars_en</a>
              <a href='https://carbonneutral.com.au/faqs/' target='_blank'>https://carbonneutral.com.au/faqs/</a>
+             </Grid>
              </Grid>
 
            </div>

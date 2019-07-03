@@ -55,7 +55,8 @@ class Home extends React.Component {
     constructor(props){
       super(props)
       this.state={
-        redirect:false
+        redirect:false,
+        redirectToExample:true,
       }
     }
     render(){
@@ -69,6 +70,7 @@ class Home extends React.Component {
                 <div className={classes.createMyMap}  onClick={()=>this.setState({redirect: true})}>Create My Map</div>
                 <h3> See your average distance, longest trip, offset the CO2 you consumed, number of countries visited, share your map and more...</h3>
                 <DashboardCard icon={Trees} title="Trees to plant: " data={25372} unit="Trees" />
+                <a href='/Pablo' style={{textDecoration: 'none'}}><div className={classes.createMyMap}>See an example</div></a>
             </Grid>
             <Grid item xs={12} sm={6} >
             <div className={classes.videoWrapper}>

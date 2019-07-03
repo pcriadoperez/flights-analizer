@@ -83,9 +83,6 @@ class UploadHistoryPage extends React.Component {
             this.setState({loading:true})
             fire.firestore().collection(value).get()
     .then(query => {
-        console.log(query)
-        console.log(query.query._query.path.segments[0])
-        console.log(this.state.name)
         if(query.size === 0 ) {
             if(query.query._query.path.segments[0] === this.state.name) this.setState({error: false, loading:false})
         }
@@ -125,7 +122,7 @@ class UploadHistoryPage extends React.Component {
       {this.state.loading && <CircularProgress className={classes.progress} />}
 
             <h3> 3. Unzip and Upload your data here</h3>
-            <h5>(The file should look like LocationHistory.json)</h5>
+            <h5>(The file should look like Location History.json)</h5>
             <Uploader name={this.state.name} onDataChange={d => this.setState({trips: d})} onDone={e => this.setState({activeStep:  this.state.activeStep + 1})}/>
             <h5>This may take a minute or two </h5>
             <h5>Don't worry we value your privacy and won't share this information with anyone. Also you can delete it anytime</h5>

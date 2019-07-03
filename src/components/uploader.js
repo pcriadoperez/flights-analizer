@@ -93,7 +93,7 @@ const styles = theme => ({
       if ( evt.target.error == null ) {
         offset += evt.target.result.length;
         var chunk = evt.target.result;
-        var percentLoaded = Math.round( 100 * offset / fileSize );
+        var percentLoaded = Math.round( 90 * offset / fileSize )//Cap at 90 to leave an extra 10 to upload to DB
         console.log( percentLoaded + '% of ' + prettyFileSize + ' loaded...' );
         self.setState({percentLoaded: percentLoaded})
         oboeInstance.emit( 'data', chunk ); // callback for handling read chunk

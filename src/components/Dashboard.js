@@ -77,7 +77,7 @@ class Dashboard extends React.Component{
         this.citiesArray.sort(function(a, b) {
           return a.x - b.x;
         });
-      console.log(this.citiesArray)
+      //console.log(this.citiesArray)
         var averageTimeBetweenFlights = ((Number(this.props.trips[this.props.trips.length-1].to.timestampMs) - Number(this.props.trips[0].from.timestampMs))/86400000)/this.props.trips.length //In days
         return(
             <Grid
@@ -92,8 +92,8 @@ class Dashboard extends React.Component{
         <DashboardCard icon={Co2} title="CO2: " data={Math.round(km*co2perkm)} unit="Tonnes" color='#FFCB23'>
         <a href='https://www.terrapass.com/product/productindividuals-families' >Offset your Carbon Footprint</a>
         </DashboardCard>
-          <DashboardCard icon={Trees} title="Trees to plant: " data={Math.round(km*co2perkm*treesperco2)} unit="Trees" />
-          <a href='https://onetreeplanted.org/'>Plant Trees</a>
+          <DashboardCard icon={Trees} title="Trees to plant: " data={Math.round(km*co2perkm*treesperco2)} unit="Trees" >
+          <a href='https://onetreeplanted.org/'>Plant Trees</a></DashboardCard>
           <DashboardCard icon={Distance} title="Distance: " data={Math.round(km)} unit="kms" color='#1E3CA0' />
           <DashboardCard icon={Distance}  title="Average trip: " data={Math.round(km/this.props.trips.length)} unit="kms" color='#FFCB23'/>
           <DashboardCard icon={Distance} title="Longest trip: " data={Math.round(longestTrip)} unit="kms" />
