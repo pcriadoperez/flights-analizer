@@ -1,4 +1,7 @@
-var firebase = require('firebase')
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
+import 'firebase/storage'
+
 const firebaseConfig = {
     apiKey: "AIzaSyCvwzJyyTRFCNF8mt2Om1lPolweWoNkNRU",
     authDomain: "green-flights.firebaseapp.com",

@@ -1,13 +1,9 @@
 import React from 'react';
 import './App.css';
 import Map from './components/Map'
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core/styles';
 import 'react-vis/dist/style.css';
-import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route} from "react-router-dom";
 import Home from './components/Home'
 import UploadHistoryPage from './components/UploadHistoryPage'
 import { AnimatedSwitch } from 'react-router-transition';
@@ -58,16 +54,9 @@ class App extends React.Component {
     const { classes } = this.props;
     return (
       <Router>
-         <AnimatedSwitch
-      atEnter={{ opacity: 0 }}
-      atLeave={{ opacity: 0 }}
-      atActive={{ opacity: 1 }}
-      className="switch-wrapper"
-    >
-         <Route path="/map" component={Maps} />
-          <Route exact path='/' component={Home} />
-        <Route exact path='/upload' component={UploadHistoryPage} />
-        </AnimatedSwitch>
+        <Route exact path='/' component={Home} />
+        <Route exact path="/:id" component={Map} />
+        <Route exact path='/menu/upload' component={UploadHistoryPage} />
         </Router>
 
     );

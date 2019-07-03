@@ -1,22 +1,18 @@
 import React from 'react';
-import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/core/styles';
 import fire from '../fire';
 import DropzoneComponent from 'react-dropzone-component';
 import ReactDOMServer from 'react-dom/server';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import  {tripDistance, timestampToDate} from './Dashboard'
+import  {tripDistance} from './Dashboard'
 import {Redirect} from 'react-router-dom'
 
 var crg = require('city-reverse-geocoder');
 var tzlookup = require("tz-lookup");
 var tzOffset = require("tz-offset")
 
-
-
-
-
 var self
+
 
 var componentConfig = {
   iconFiletypes: ['.json'],
@@ -25,22 +21,22 @@ var componentConfig = {
   
 };
 
-
-
 const prettySize = require('prettysize')
 
 var reader = new FileReader()
-
 
 function tripSpeed(trip){
   return(trip.distance / ((trip.to.date - trip.from.date )/3600000))
 }
 
 function uploadToDB(array, name){
-  array.forEach(element => fire.firestore().collection(name).doc(element.to.timestampMs).set(element))
+  let count=0
+  array.forEach(element => fire.firestore().collection(name).doc(element.to.timestampMs).set(element).then(()=>{count++; if(count >= array.length)uploadCallback()}))
 }
-
-
+function uploadCallback(){
+  console.log('Upload Callback')
+  self.setState({uploadComplete: true})
+}
 
 var oboe = require('oboe')
 let oboejs = new oboe()
@@ -84,8 +80,6 @@ const styles = theme => ({
     },
   });
 
- 
-  
   function parseJSONFile ( file, oboeInstance ) {
     var fileSize = file.size;
     var prettyFileSize = prettySize(fileSize);
@@ -99,7 +93,7 @@ const styles = theme => ({
       if ( evt.target.error == null ) {
         offset += evt.target.result.length;
         var chunk = evt.target.result;
-        var percentLoaded = ( 100 * offset / fileSize ).toFixed( 0 );
+        var percentLoaded = Math.round( 100 * offset / fileSize );
         console.log( percentLoaded + '% of ' + prettyFileSize + ' loaded...' );
         self.setState({percentLoaded: percentLoaded})
         oboeInstance.emit( 'data', chunk ); // callback for handling read chunk
@@ -132,12 +126,10 @@ const styles = theme => ({
         parseJSONFile(file ,  oboejs )
       },
       previewTemplate: ReactDOMServer.renderToStaticMarkup(
-        <div style={{border: 'black', borderWidth:'thin', borderStyle: 'dashed'}}>
         <div className="dz-preview dz-file-preview">
           <div className="dz-details">
           </div>
           <div className="dz-progress"><span className="dz-upload" data-dz-uploadprogress="true"></span></div>
-        </div>
         </div>
       )
     }
@@ -174,7 +166,7 @@ const styles = theme => ({
       processing: null,
       uploadprogress: null,
       sending: null,
-      success: this.onUploadSuccessHandler,
+      success: null,
       complete: null,
       canceled: null,
       maxfilesreached: null,
@@ -184,8 +176,6 @@ const styles = theme => ({
       reset: null,
       queuecomplete: null
     }
-    onUploadSuccessHandler = e => this.setState({uploadComplete: true}) 
-
     handleClose() {
       this.setState({
           open: false
@@ -215,12 +205,15 @@ const styles = theme => ({
       <div>
          {(this.state.percentLoaded != 100 && this.state.percentLoaded != 0) ?
           <LinearProgress variant="determinate" value={this.state.percentLoaded }/> :
-          <div>
-            
+          <div style={{border: '2px solid #4c9ffe',
+          color: '#4c9ffe',
+          padding: 5,
+          margin: 5}} >
           <DropzoneComponent config={componentConfig}
           eventHandlers={this.eventHandlers} djsConfig={this.djsConfig} 
            /></div>}
-           {this.state.uploadComplete === true && <Redirect push to={"/map/"+this.state.name} />}         
+           {console.log(this.state.uploadComplete )}
+           {this.state.uploadComplete === true && <Redirect to={"/"+name} />}
          
       </div>
         )}

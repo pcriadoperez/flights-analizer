@@ -2,18 +2,13 @@ import React from 'react';
 import {
   XYPlot,
   XAxis,
-  YAxis,
   VerticalGridLines,
   HorizontalGridLines,
   VerticalBarSeries,
   LineSeries,
   Crosshair,
-  Highlight
+  
 } from 'react-vis';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import { derToJose } from 'ecdsa-sig-formatter';
 
 
 
@@ -112,11 +107,11 @@ export default class TimeChart extends React.Component {
         if(a.y<v.y) return v
         else return a
     }).y
-    console.log(this.props.data)
-    console.log(barData)
-    console.log(this.props.time)
+    //console.log(this.props.data)
+    //console.log(barData)
+    //console.log(this.props.time)
     return (
-        <XYPlot margin={{left: 10, right: 10, top: 10, bottom: 30}} width={this.state.width} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
+        <XYPlot margin={{left: 10, right: 0, top: 10, bottom: 30}} width={this.state.width} height={100} xType="time" yType="linear" onMouseLeave={this._mouseLeaveHandler}>
           <VerticalGridLines />
           <HorizontalGridLines />
           <XAxis />

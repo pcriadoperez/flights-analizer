@@ -20,12 +20,10 @@ export default class HorizontalSeries extends React.Component {
       };
     
   render() {
-      console.log(this.state.value)
     let maxLabelLength = this.props.data.reduce(function(a,v){
         if(a.y.length < v.y.length) return v
         else return a
           }).y.length
-    console.log(maxLabelLength)
     return (
       <Card>
           <CardContent>

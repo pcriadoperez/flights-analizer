@@ -1,0 +1,83 @@
+[debug] [2019-07-03T00:03:29.541Z] ----------------------------------------------------------------------
+[debug] [2019-07-03T00:03:29.543Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\pablo\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2019-07-03T00:03:29.543Z] CLI Version:   7.0.2
+[debug] [2019-07-03T00:03:29.543Z] Platform:      win32
+[debug] [2019-07-03T00:03:29.543Z] Node Version:  v8.11.3
+[debug] [2019-07-03T00:03:29.544Z] Time:          Tue Jul 02 2019 20:03:29 GMT-0400 (Eastern Daylight Time)
+[debug] [2019-07-03T00:03:29.544Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-07-03T00:03:29.580Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-07-03T00:03:29.583Z] > authorizing via signed-in user
+[debug] [2019-07-03T00:03:29.583Z] [iam] checking project green-flights for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2019-07-03T00:03:29.586Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2019-07-03T00:03:29.587Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2019-07-03T00:03:29.862Z] <<< HTTP RESPONSE 200
+[debug] [2019-07-03T00:03:29.868Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/green-flights:testIamPermissions  
+
+[debug] [2019-07-03T00:03:30.230Z] <<< HTTP RESPONSE 200
+[debug] [2019-07-03T00:03:30.232Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/green-flights  
+ 
+[debug] [2019-07-03T00:03:30.629Z] <<< HTTP RESPONSE 200
+[warn] !  functions: package.json indicates an outdated version of firebase-functions.
+ Please upgrade using npm install --save firebase-functions@latest in your functions directory.
+[info] 
+[info] === Deploying to 'green-flights'...
+[info] 
+[info] i  deploying firestore, functions, hosting
+[info] i  firestore: checking firestore.rules for compilation errors...
+[info] i  firestore: reading indexes from firestore.indexes.json...
+[debug] [2019-07-03T00:03:34.205Z] >>> HTTP REQUEST POST https://firebaserules.googleapis.com/v1/projects/green-flights:test  
+
+[debug] [2019-07-03T00:03:34.533Z] <<< HTTP RESPONSE 200
+[info] +  firestore: rules file firestore.rules compiled successfully
+[debug] [2019-07-03T00:03:34.536Z] > [functions] package.json contents: {
+  "name": "bigquery-import-functions",
+  "description": "Import data to BigQuery Firebase Functions sample",
+  "dependencies": {
+    "@google-cloud/bigquery": "^0.6.0",
+    "firebase-admin": "~7.1.1",
+    "firebase-functions": "^2.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.13.1",
+    "eslint-plugin-promise": "^3.6.0"
+  },
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint --max-warnings=0 .",
+    "serve": "firebase serve --only functions",
+    "shell": "firebase experimental:functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "private": true
+}
+[info] i  functions: ensuring necessary APIs are enabled...
+[debug] [2019-07-03T00:03:34.537Z] >>> HTTP REQUEST GET https://servicemanagement.googleapis.com/v1/services/cloudfunctions.googleapis.com/projectSettings/green-flights?view=CONSUMER_VIEW  
+ 
+[debug] [2019-07-03T00:03:34.538Z] >>> HTTP REQUEST GET https://servicemanagement.googleapis.com/v1/services/runtimeconfig.googleapis.com/projectSettings/green-flights?view=CONSUMER_VIEW  
+ 
+[debug] [2019-07-03T00:03:35.264Z] <<< HTTP RESPONSE 200
+[debug] [2019-07-03T00:03:35.394Z] <<< HTTP RESPONSE 200
+[info] +  functions: all necessary APIs are enabled
+[debug] [2019-07-03T00:03:35.397Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/green-flights  
+ 
+[debug] [2019-07-03T00:03:35.703Z] <<< HTTP RESPONSE 200
+[debug] [2019-07-03T00:03:35.704Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/913693404042:getServerAppConfig  
+ 
+[debug] [2019-07-03T00:03:35.983Z] <<< HTTP RESPONSE 200
+[debug] [2019-07-03T00:03:35.986Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/green-flights/versions  
+
+[debug] [2019-07-03T00:03:36.830Z] <<< HTTP RESPONSE 200
+[info] i  firestore: uploading rules firestore.rules...
+[debug] [2019-07-03T00:03:36.833Z] >>> HTTP REQUEST POST https://firebaserules.googleapis.com/v1/projects/green-flights/rulesets  
+
+[debug] [2019-07-03T00:03:36.834Z] >>> HTTP REQUEST GET https://firestore.googleapis.com/v1beta2/projects/green-flights/databases/(default)/collectionGroups/-/indexes  
+ 
+[debug] [2019-07-03T00:03:37.129Z] <<< HTTP RESPONSE 200
+[debug] [2019-07-03T00:03:37.130Z] >>> HTTP REQUEST GET https://firestore.googleapis.com/v1beta2/projects/green-flights/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false  
+ 

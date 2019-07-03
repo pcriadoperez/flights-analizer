@@ -2,35 +2,22 @@ import React from 'react';
 import DeckGL, {ArcLayer, ScatterplotLayer, FlyToInterpolator} from 'deck.gl';
 import MapGL from 'react-map-gl';
 import fire from '../fire';
-import Dashboard, {tripDistance, timestampToDate} from './Dashboard'
+import Dashboard, { timestampToDate} from './Dashboard'
 import Slider from '@material-ui/lab/Slider';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid'
 import TimeChart from './TimeChart'
 import 'react-sharingbuttons/dist/main.css'
 import { Facebook } from 'react-sharingbuttons'
-import { Route, Redirect } from 'react-router'
+import {  Redirect } from 'react-router'
 import {ReactComponent as PlayButton} from '../Assets/play-button.svg'
 import {ReactComponent as PauseButton} from '../Assets/pause.svg'
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import {withRouter} from 'react-router-dom';
 
 
-
-
-var name = 'Pablo'
-
 // Set your mapbox access token here
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicGNyaWFkb3AiLCJhIjoiY2p2cHBtNWt2MmNhbzRjb2l1cGtzYTQ1cCJ9.CNrvo_d0_vWXZJ0wM0w2gw';
-
-// Initial viewport settings
-const initialViewState = {
-  longitude: 0,
-  latitude: 0,
-  zoom: 1,
-  pitch: 0,
-  bearing: 0
-};
 
 const CustomSlider = withStyles({
   root: {
@@ -48,12 +35,17 @@ const CustomSlider = withStyles({
     backgroundColor:'#4C9FFE',
     height: 6,
     borderRadius: 3,
-  },
-  rail: {
-    height: 6,
-    borderRadius: 3,
-  },
+  }
 })(Slider);
+const INITIAL_VIEW_STATE = {
+  longitude: 0,
+  latitude: 0,
+  zoom: 1,
+  minZoom: 1,
+  maxZoom: 16,
+  pitch: 30,
+  bearing: 0
+};
 
 class Map extends React.Component {
   constructor(props){
@@ -66,7 +58,8 @@ class Map extends React.Component {
         latitude: 0,
         longitude: 0,
         zoom: 1,
-        pitch: 30
+        pitch: 30,
+        bearing:0
       },
       loading : true,
       redirect: false,
@@ -80,6 +73,7 @@ class Map extends React.Component {
     window.addEventListener('resize', this._resize);
     this._resize();
     //Download data
+    console.log('Downloading map:'+this.props.match.params.id)
     fire.firestore().collection(this.props.match.params.id).get().then(snapshot => {
       let incomingData = []
       snapshot.forEach(doc => {
@@ -89,6 +83,7 @@ class Map extends React.Component {
         console.log(doc.id, '=>', doc.data());
       });
       console.log(incomingData)
+      if(incomingData.length === 0 ) this.setState({redirect: true})
       this.setState({data: incomingData, filteredData: incomingData, sliderValue: Number(incomingData[0].from.timestampMs),downloading: false})
     })
     .catch(err => {
@@ -127,18 +122,19 @@ class Map extends React.Component {
     );
   }  
       _onViewportChange = viewport => {
-        this.setState({viewport});
+        this.setState({
+          viewport: { ...this.state.viewport, ...viewport }
+        });
       }
       _flyTo = (lat,long) => {
         this.setState({
-          viewState: {
-            ...this.state.viewState,
+          viewport: {
             longitude: long,
             latitude: lat,
-            zoom: 14,
-            pitch: 0,
+            zoom: 2,
+            pitch: 30,
             bearing: 0,
-            transitionDuration: 1000,
+            transitionDuration: 100,
             transitionInterpolator: new FlyToInterpolator()
           }
         });
@@ -214,20 +210,15 @@ class Map extends React.Component {
           )
         }
         else {
+          console.log('ReRender Map')
           return (
-            <Grid
-  container
-  direction="column"
-  justify="flex-start"
-  alignItems="center"
->
+            <Grid container direction="column" justify="flex-start" alignItems="center">
              <MapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
                {...viewport}
                onViewportChange={(viewport) => this.setState({viewport})}
              >
              <DeckGL
-             controller={true}
-             viewState={viewport}
+             viewState={this.state.viewport} 
              layers={[
                new ArcLayer({
                  data: this.state.filteredData,
@@ -261,23 +252,12 @@ class Map extends React.Component {
                  getLineColor: d => [0, 0, 0]})
              ]}
            >
-            { this._renderTooltip() }
-           <ScatterplotLayer id='scatterplot-layer' pickable={true}
-       opacity={0.8}
-       filled={true}
-       radiusScale={6}
-       radiusMinPixels={1}
-       radiusMaxPixels={100}
-       lineWidthMinPixel={1}
-       getPosition={d => [0,0]}
-       getRadius={d => Math.sqrt(d.exits)}
-       getFillColor={d => [255, 140, 0]}
-       getLineColor={d => [0, 0, 0]} />
            </DeckGL>
+           { this._renderTooltip() }
            </MapGL>
            {this.state.data.length >0 &&
            <div>
-             <Grid style={{marginLeft:20, marginRight:20, marginTop:5, marginBottom:10}} container direction="row" justify="center" alignItems="center">
+             <Grid container direction="row" justify="center" alignItems="center">
                {this.timer ? <PauseButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} />:
                <PlayButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} /> }
              <Grid>
@@ -293,7 +273,7 @@ class Map extends React.Component {
              </Grid>
           </Grid>
            <Dashboard trips={this.state.filteredData} />
-           <Grid style={{margin:10}} container direction="row" justify="center" alignItems="center" >
+           <Grid container direction="row" justify="center" alignItems="center" >
             <h5> Share my map: </h5>
             <div>
             <Facebook url={window.location.href} />
@@ -301,14 +281,19 @@ class Map extends React.Component {
            </Grid>
            <Grid container direction="row" justify="center" alignItems="center" >
            <h5>Did you like this page?   </h5>
-           <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/pablito"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"/><span style={{marginLeft: '5px'}}>Buy me a coffee</span></a>
+           <a className="bmc-button" target="_blank" href="https://www.buymeacoffee.com/pablito"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"/><span style={{marginLeft: '5px'}}>Buy me a coffee</span></a>
            </Grid>
            <Grid container direction="row" justify="center" alignItems="center" >
            <h5>
              Don't want this page anymore: <a href="/" onClick={this._handleClickDelete}> Delete this map</a>
            </h5>
-
              </Grid>
+             <Grid container direction="row" justify="center" alignItems="center" >
+           <h5>
+             Feel free to reach out: hi@wherehaveibeenintheworld.com
+           </h5>
+             </Grid>
+
            </div>
              }
            </Grid>
