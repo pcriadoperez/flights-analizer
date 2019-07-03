@@ -67,7 +67,7 @@ class Home extends React.Component {
                 <h1>Create a map using your Google Location </h1>
                 <div style={{backgroundColor:'black', width:250, height: 4, margin:5}}/>
                 <div className={classes.createMyMap}  onClick={()=>this.setState({redirect: true})}>Create My Map</div>
-                <h3> See your average distance, longest trip, how much CO2 you consumed, number of countries visited and more...</h3>
+                <h3> See your average distance, longest trip, offset the CO2 you consumed, number of countries visited, share your map and more...</h3>
                 <DashboardCard icon={Trees} title="Trees to plant: " data={25372} unit="Trees" />
             </Grid>
             <Grid item xs={12} sm={6} >

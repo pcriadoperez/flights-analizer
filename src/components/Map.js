@@ -1,6 +1,6 @@
 import React from 'react';
 import DeckGL, {ArcLayer, ScatterplotLayer, FlyToInterpolator} from 'deck.gl';
-import MapGL from 'react-map-gl';
+import MapGL, {StaticMap} from 'react-map-gl';
 import fire from '../fire';
 import Dashboard, { timestampToDate} from './Dashboard'
 import Slider from '@material-ui/lab/Slider';
@@ -14,6 +14,8 @@ import {ReactComponent as PlayButton} from '../Assets/play-button.svg'
 import {ReactComponent as PauseButton} from '../Assets/pause.svg'
 import { withStyles } from '@material-ui/core/styles';
 import {withRouter} from 'react-router-dom';
+import {easeCubic} from 'd3-ease';
+
 
 
 // Set your mapbox access token here
@@ -126,17 +128,19 @@ class Map extends React.Component {
           viewport: { ...this.state.viewport, ...viewport }
         });
       }
-      _flyTo = (lat,long) => {
+      _flyTo = (lat,long,pitch,zoom) => {
         this.setState({
           viewport: {
+            width: window.innerWidth-20,
+            height: window.innerHeight-150,
             longitude: long,
             latitude: lat,
-            zoom: 2,
-            pitch: 30,
+            zoom: zoom,
+            pitch: pitch,
             bearing: 0,
-            transitionDuration: 100,
+            transitionDuration: 1000,
             transitionInterpolator: new FlyToInterpolator()
-          }
+            }
         });
       }
       _handleClickDelete = (e) =>{
@@ -159,11 +163,12 @@ class Map extends React.Component {
         }
         this.timer = setInterval(() => {
           if(this.state.sliderValue<Number(this.state.data[this.state.data.length-1].to.timestampMs)){
-            //if(this.state.filteredData.length>0) this._flyTo(this.state.filteredData[this.state.filteredData.length-1].from.latitudeE7/1e7, this.state.filteredData[this.state.filteredData.length-1].from.longitudeE7/1e7)
+            if(this.state.filteredData.length>0) this._flyTo(this.state.filteredData[this.state.filteredData.length-1].from.latitudeE7/1e7, this.state.filteredData[this.state.filteredData.length-1].from.longitudeE7/1e7,30,Math.max(1, Math.min(3,Math.round(14000/this.state.filteredData[this.state.filteredData.length-1].distance))))
             this._handleSliderChange('play', this.state.sliderValue + Math.round(sliderRange/300))
           }
           else{
             this._handleSliderChange('stop', this.state.sliderValue + Math.round(sliderRange/300))
+            this._flyTo(0,0,30,1)
           }
       }, 100)
       }
@@ -213,12 +218,12 @@ class Map extends React.Component {
           console.log('ReRender Map')
           return (
             <Grid container direction="column" justify="flex-start" alignItems="center">
-             <MapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-               {...viewport}
-               onViewportChange={(viewport) => this.setState({viewport})}
-             >
+            <div style={{backgroundColor:'white', width:this.state.viewport.width, height:this.state.viewport.height}}/>
              <DeckGL
-             viewState={this.state.viewport} 
+             height={this.state.viewport.height}
+             viewState={this.state.viewport}
+             controller
+             initialViewState={INITIAL_VIEW_STATE}
              layers={[
                new ArcLayer({
                  data: this.state.filteredData,
@@ -252,9 +257,9 @@ class Map extends React.Component {
                  getLineColor: d => [0, 0, 0]})
              ]}
            >
+                        <StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
+                        { this._renderTooltip() }
            </DeckGL>
-           { this._renderTooltip() }
-           </MapGL>
            {this.state.data.length >0 &&
            <div>
              <Grid container direction="row" justify="center" alignItems="center">
@@ -292,6 +297,10 @@ class Map extends React.Component {
            <h5>
              Feel free to reach out: hi@wherehaveibeenintheworld.com
            </h5>
+           <div>Sources:</div>
+           <a href='https://www.carbonindependent.org/sources_aviation.html' target='_blank'>https://www.carbonindependent.org/sources_aviation.html</a>
+           <a href='https://ec.europa.eu/clima/policies/transport/vehicles/cars_en' target='_blank'>https://ec.europa.eu/clima/policies/transport/vehicles/cars_en</a>
+             <a href='https://carbonneutral.com.au/faqs/' target='_blank'>https://carbonneutral.com.au/faqs/</a>
              </Grid>
 
            </div>

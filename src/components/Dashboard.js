@@ -2,7 +2,6 @@ import React from 'react'
 import DashboardCard from './DashboardCard'
 import Grid from '@material-ui/core/Grid';
 import HorizontalSeries from './HorizontalSeries'
-import { bboxes } from 'ngeohash';
 import { ReactComponent as ClockIcon} from '../Assets/time.svg'
 import { ReactComponent as Aeroplane} from '../Assets/aeroplane.svg';
 import { ReactComponent as Co2} from '../Assets/co2-gas.svg'
@@ -16,7 +15,8 @@ import { ReactComponent as Event } from '../Assets/event.svg'
 
 
 
-const co2perkm = 0.189655172
+const co2perkm = 0.00012 //10^3kg of CO2/km
+const treesperco2 = 15
 
 export function timestampToDate(timestamp){
     var date
@@ -89,10 +89,11 @@ class Dashboard extends React.Component{
             <DashboardCard icon={Aeroplane} title="Trips" data={this.props.trips.length} unit="trips" color='#4C9FFE'  />
             <DashboardCard icon={ClockIcon} title="First Trip: " data={timestampToDate(Number(this.props.trips[0].to.timestampMs))} />
           <DashboardCard icon={ClockIcon} title="Last Trip: " data= {timestampToDate(Number(this.props.trips[this.props.trips.length-1].to.timestampMs))} color='#1E3CA0'/>
-        <DashboardCard icon={Co2} title="CO2: " data={Math.round(km*co2perkm/1000)} unit="tons" color='#FFCB23'>
+        <DashboardCard icon={Co2} title="CO2: " data={Math.round(km*co2perkm)} unit="Tonnes" color='#FFCB23'>
         <a href='https://www.terrapass.com/product/productindividuals-families' >Offset your Carbon Footprint</a>
         </DashboardCard>
-          <DashboardCard icon={Trees} title="Trees to plant: " data={Math.round(km*co2perkm/7.25748)} unit="Trees" />
+          <DashboardCard icon={Trees} title="Trees to plant: " data={Math.round(km*co2perkm*treesperco2)} unit="Trees" />
+          <a href='https://onetreeplanted.org/'>Plant Trees</a>
           <DashboardCard icon={Distance} title="Distance: " data={Math.round(km)} unit="kms" color='#1E3CA0' />
           <DashboardCard icon={Distance}  title="Average trip: " data={Math.round(km/this.props.trips.length)} unit="kms" color='#FFCB23'/>
           <DashboardCard icon={Distance} title="Longest trip: " data={Math.round(longestTrip)} unit="kms" />
