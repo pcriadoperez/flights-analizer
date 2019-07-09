@@ -391,7 +391,7 @@ km:{Math.round(hoveredObject.distance)}</p>
                { this._renderTooltip() }
         </DeckGL>
               {this.state.data.length >0 && (
-<div>
+<Grid container direction='column'>
              <Grid container direction="row" justify="center" alignItems="center">
                {this.timer ? <PauseButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} />:
                <PlayButton style={{width:50, height:50, fill:'#4C9FFE'}} onMouseEnter={e=> e.target.style.fill='#1E3CA0'} onMouseLeave={e=> e.target.style.fill='#4C9FFE'} onClick={this._handlePlayClick} /> }
@@ -407,7 +407,7 @@ km:{Math.round(hoveredObject.distance)}</p>
               />
              </Grid>
           </Grid>
-           <Dashboard trips={this.state.filteredData} />
+           <Dashboard trips={this.state.filteredData} width={window.innerWidth}/>
            <Grid container direction="row" justify="center" alignItems="center" >
             <h5> Share my map: </h5>
             <div>
@@ -431,7 +431,7 @@ km:{Math.round(hoveredObject.distance)}</p>
            </h5>
              </Grid>
 
-           </div>
+           </Grid>
 )}
       </Grid>
     );

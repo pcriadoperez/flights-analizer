@@ -1,13 +1,11 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
 
 const styles = {
   card: {
+    boxSizing: "border-box",
     position: "relative",
-    width: "16.6%",
+    width: "100%",
     padding: "0.75rem",
     "&:after": {
       content: `''`,
@@ -52,11 +50,9 @@ class DashboardCard extends React.Component {
         <div className={classes.cardContent}>
           {this.props.icon && <Icon className={classes.icon} />}
           <div className={classes.title}>{this.props.title}</div>
-          <div className={classes.data}>
-            {`${String(this.props.data)} ${this.props.unit}`
-              ? this.props.unit
-              : ""}
-          </div>
+          {this.props.data && <div className={classes.data}>
+            {`${this.props.data} ${this.props.unit}`}
+          </div>}
           {this.props.children}
         </div>
       </div>

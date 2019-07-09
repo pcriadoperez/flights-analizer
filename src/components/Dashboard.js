@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React from "react";
 import Grid from "@material-ui/core/Grid";
 import DashboardCard from "./DashboardCard";
@@ -18,9 +19,10 @@ const treesperco2 = 15;
 const kmpermovie = 1500; // Assumes 500km/h and 1.5h per movie
 const colors = {
   time: ["#3023ae", "#c86dd7"],
+  time2: ["#36c36c", "#36c36c"],
   distance: ["#aaa", "#ccc"],
   sustainability: ["#36c36c", "#36c36c"],
-  geography: ["#aaa", "#ccc"]
+  geography: ["#3023ae", "#c86dd7"]
 };
 
 export function timestampToDate(timestamp) {
@@ -116,21 +118,26 @@ class Dashboard extends React.Component {
         direction="column"
         justify="flex-start"
         alignItems="center"
+        style={{backgroundColor: "#e9e9e9"}}
       >
         <Grid
           className="dashboard-group"
+          direction='column'
           container
           justify="center"
           alignItems="center"
         >
-          <Grid container direction="row" justify="center" alignItems="center">
-                <DashboardCard
+        <Grid container direction='row' justify="center" alignItems="stretch" >
+          <Grid item xs={6} sm={3} md={2}>
+            <DashboardCard 
               icon={ClockIcon}
               title="First Trip"
               data={timestampToDate(Number(this.props.trips[0].to.timestampMs))}
-              color={colors.time}
+              color={colors.time} unit=''
             />
-                <DashboardCard
+            </Grid>
+            <Grid item xs={6} sm={3} md={2}>
+            <DashboardCard
               icon={ClockIcon}
               title="Last Trip"
               data={timestampToDate(
@@ -138,41 +145,41 @@ class Dashboard extends React.Component {
                   this.props.trips[this.props.trips.length - 1].to.timestampMs
                 )
               )}
-              color={colors.time}
+              color={colors.time} unit=''
             />
-              </Grid>
-          <Grid container direction="row" justify="center" alignItems="center">
+            </Grid>
+            </Grid>
+          <Grid container direction="row" justify="center" alignItems="stretch">
+          <Grid item xs={6} sm={3} md={2}>
                 <DashboardCard
-              color={colors.time}
-              icon={Aeroplane}
-              title="Trips"
-              data={this.props.trips.length}
-              unit="trips"
-              color="#3023ae"
-              color2="#c86dd7"
+                color={colors.time}
+                icon={Aeroplane}
+                title="Trips"
+                data={this.props.trips.length}
+                unit="trips"
             />
-                <div
-              style={{
-                widht: 400,
-                height: 400,
-                paddingTop: 30,
-                paddingLeft: 100
-              }}
-            >
-              <h1>Time is precious</h1>
-              <div>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+            <DashboardCard color={[ "#fff", "#fff"]}>
+              <h1 style={{color:'dark-gray'}}>Time is precious</h1>
+              <div style={{color:'dark-gray'}}>
                 Based on your Google Location record, We will calculate your
                 average distance, longest trip, how many CO2 you consumed, how
                 many trees to plant, and more…
-            </div>
-            </div>
-                <DashboardCard
+              </div>
+              </DashboardCard>
+            </Grid>
+            <Grid item xs={12} sm={3} md={2}>
+            <Grid container direction='row' justify="space-between" alignItems="stetch" style={{height:'100%'}}>
+              <Grid item xs={6} sm={12}>
+            <DashboardCard
               color={colors.time}
               title="You travel on average every"
               data={Math.round(averageTimeBetweenFlights)}
               unit="days"
-            />
-                {(Date.now() -
+            /></Grid>
+            <Grid item xs={6} sm={12}>
+            {(Date.now() -
               Number(
                 this.props.trips[this.props.trips.length - 1].to.timestampMs
               )) /
@@ -213,54 +220,95 @@ class Dashboard extends React.Component {
                 unit="days"
               />
             )}
-              </Grid>
+            </Grid>
+            </Grid>
+            </Grid>
+          </Grid>
           <Grid container direction="row" justify="center" alignItems="center">
-                <HorizontalSeries
+          <Grid item xs={12} sm={6} md={4}>
+            <HorizontalSeries color={colors.time} width={this.props.width}
               title="Places visited"
               data={this.citiesArray.slice(-10)}
             />
-              </Grid>
+             </Grid>
+          </Grid>
         </Grid>
         <Grid
           container
           direction="column"
-          justify="flex-start"
+          justify="center"
           alignItems="center"
           className="dashboard-group"
         >
+          <Grid container direction="row" justify="center" alignItems="stretch">
+            <Grid item xs={6} sm={3} md={2} />
+            <Grid item xs={6} sm={3} md={2}>
+            <DashboardCard
+              color={colors.distance}
+              icon={Distance}
+              title="Distance"
+              data={Math.round(km)}
+              unit="kms"
+            />
+            </Grid>
+            <Grid item xs={6} sm={3} md={2} />
+            <Grid item xs={6} sm={3} md={2}>
+            <DashboardCard
+              color={colors.distance}
+              icon={Distance}
+              title="Average trip"
+              data={Math.round(km / this.props.trips.length)}
+              unit="kms"
+            />
+            </Grid>
+          </Grid>
           <Grid container direction="row" justify="center" alignItems="center">
-                <DashboardCard color={['#fff', '#fff']} />
-                <DashboardCard color={colors.distance} icon={Distance} title="Distance" data={Math.round(km)} unit="kms"  />
-                <DashboardCard color={['#fff', '#fff']} />
-                <DashboardCard color={colors.distance} icon={Distance} title="Average trip" data={Math.round(km/this.props.trips.length)} unit="kms" />
-              </Grid>
-          <Grid container direction="row" justify="center" alignItems="center">
-                <DashboardCard
+          <Grid item xs={6} sm={3} md={2}>
+            <DashboardCard
               color={colors.distance}
               icon={Distance}
               title="Longest trip"
               data={Math.round(longestTrip)}
               unit="kms"
             />
-                <DashboardCard color={["#fff", "#fff"]}>
+            </Grid>
+            <Grid item xs={6} sm={3} md={2}>
               <h2>General Overview</h2>
-            </DashboardCard>
-                <DashboardCard
+            </Grid>
+            <Grid item xs={6} sm={3} md={2}>
+            <DashboardCard
               color={colors.distance}
               icon={World}
               title="Around the world"
               data={Math.round(km / 40074)}
               unit="times"
             />
-                <DashboardCard color={["#fff", "#fff"]}>
+            </Grid>
+            <Grid item xs={6} sm={3} md={2}>
+            <DashboardCard color={["#fff", "#fff"]}>
               <div>
                 Based on your Google Location record, We will calculate your
                 average distance, longest trip, how many CO.`
               </div>
             </DashboardCard>
-              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid container direction="row" justify="center" alignItems="center">
+        <Grid
+          container
+          direction="column"
+          justify="center"
+          alignItems="center"
+          className="dashboard-group"
+        >
+        <Grid container direction="row" justify="center" alignItems="stretch">
+        <Grid item xs={6} sm={3} md={2}>
+        <h2>Where have I been</h2>
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
+        <div>asdlkfjsa;ldkfj sldkfjsd;lkfjasdlkjf  sndflkjsdalfkjsad</div>
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
           <DashboardCard
             color={colors.geography}
             icon={CountriesIcon}
@@ -268,13 +316,19 @@ class Dashboard extends React.Component {
             data={Object.keys(countries).length}
             unit="countries"
           />
+          </Grid>
+          <Grid item xs={6} sm={3} md={2}>
           <DashboardCard
             color={colors.geography}
             icon={City}
-                title="Cities visited"
+            title="Cities visited"
             data={Object.keys(cities).length}
-                unit="cities"
-              />
+            unit="cities"
+          />
+          </Grid>
+          </Grid>
+          <Grid container direction="row" justify="center" alignItems="stretch">
+          <Grid item xs={6} sm={3} md={2}>
           <DashboardCard
             color={colors.geography}
             icon={Favorite}
@@ -284,61 +338,127 @@ class Dashboard extends React.Component {
             )}
             unit="times"
           />
+          </Grid>
+          <Grid item xs={6} sm={3} md={2}>
           <DashboardCard
-                color={colors.geography} icon={Favorite}
-                title="Most travelled"
-                data={Object.keys(legCounter).reduce((a, b) => legCounter[a] > legCounter[b] ? a : b)}
-                unit="times"
-              />
+            color={colors.geography}
+            icon={Favorite}
+            title="Most travelled"
+            data={Object.keys(legCounter).reduce((a, b) =>
+              legCounter[a] > legCounter[b] ? a : b
+            )}
+            unit="times"
+          />
+          </Grid>
+          <Grid item xs={6} sm={3} md={2}></Grid>
+          <Grid item xs={6} sm={3} md={2}></Grid>
+          </Grid>
         </Grid>
+        <Grid
+          className="dashboard-group"
+          container
+          justify="center"
+          alignItems="stretch"
+        >
+        <Grid container direction='row' justify='center' alignItems='stretch'>
+        <Grid item xs={6} sm={3} md={2}>
         <DashboardCard
-          color={colors.time}
+          color={colors.time2}
           icon={ClockIcon}
-          title="Movies seen"
+          title="Possible New Friends"
+          data={Math.round(km / kmpermovie)}
+          unit="friends"
+        />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+        <h2>Time Travelling</h2>
+        <div> asd;klfjasdkl;fja;sdlkf</div>
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
+        <DashboardCard
+          color={colors.time2}
+          icon={ClockIcon}
+          title="Books"
+          data={Math.round(km / kmpermovie)}
+          unit="books"
+        />
+        </Grid>
+        </Grid>
+        <Grid container direction='row' justify='center' alignItems='stretch'>
+        <Grid xs={6} sm={3} md={2}>
+        <DashboardCard
+          color={colors.time2}
+          icon={ClockIcon}
+          title="Movies"
           data={Math.round(km / kmpermovie)}
           unit="movies"
         />
+        </Grid>
+        <Grid xs={6} sm={3} md={2}>
+        <DashboardCard
+          color={colors.time2}
+          icon={ClockIcon}
+          title="Days"
+          data={Math.round(km / kmpermovie)}
+          unit="days"
+        />
+        </Grid>
+        </Grid>
+        </Grid>
         <Grid
           container
           className="dashboard-group"
           direction="row"
-          justify="flex-start"
-          alignItems="center"
+          justify="center"
+          alignItems="stretch"
         >
-          <Grid item xs={12} sm={6}>
-                <Grid
+          <Grid item xs={12} sm={6} md={4}>
+            <Grid
               container
               direction="row"
               justify="flex-end"
-              alignItems="flex-start"
+              alignItems="stretch"
             >
-              <DashboardCard color={["#fff", "#fff"]} />
+              <Grid item xs={6} />
+              <Grid item xs={6}>
               <DashboardCard
                 color={colors.sustainability}
                 icon={Co2}
                 title="CO2"
                 data={Math.round(km * co2perkm)}
-                unit="Tonnes">
+                unit="Tonnes"
+              >
                 <a href="https://www.terrapass.com/product/productindividuals-families">
                   Offset your Carbon Footprint
-                  </a>
+                </a>
               </DashboardCard>
+              </Grid>
             </Grid>
-                <Grid
+
+            <Grid
               container
               direction="row"
               justify="flex-end"
-              alignItems="flex-start">
-              <DashboardCard color={colors.sustainability} icon={Trees} title="Trees to plant" data={Math.round(km*co2perkm*treesperco2)} unit="Trees">
-                  <a href='https://onetreeplanted.org/'>Plant Trees</a>
+              alignItems="stretch"
+            >
+            <Grid item xs={6}>
+              <DashboardCard
+                color={colors.sustainability}
+                icon={Trees}
+                title="Trees to plant"
+                data={Math.round(km * co2perkm * treesperco2)}
+                unit="Trees"
+              >
+                <a href="https://onetreeplanted.org/">Plant Trees</a>
               </DashboardCard>
-              <DashboardCard color={["#fff", "#fff"]} />
+              </Grid>
+              <Grid xs={6}/>
             </Grid>
-              </Grid>
-          <Grid item xs={12} sm={6}>
-                <div>Sustainability</div>
-                <div> balabalbalbalba </div>
-              </Grid>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <h2>Sustainability</h2>
+            <div> balabalbalbalba </div>
+          </Grid>
         </Grid>
       </Grid>
     );
