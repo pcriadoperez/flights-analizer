@@ -1,47 +1,67 @@
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
+import React from "react";
+import { withStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
 
-const styles  ={
-    card: {
-      width: 275,
-      padding: 10,
-      height: 275
-        },
-    title: {
-      fontSize: 60,
-    },
-    pos: {
-      margin: 12,
-    },
-  }
-
-class DashboardCard extends React.Component{
-    render(){
-        var { classes } = this.props;
-        const Icon = this.props.icon
-        return (
-            <Card className={classes.card} style={{backgroundColor: this.props.color, width: this.props.width ? this.props.width :classes.card.width }}>
-              <CardContent>
-                {this.props.icon && <Icon style={{width:100, height:100, fill:this.props.color ? 'white' : 'black'}} />}
-                <Typography variant="h5" component="h2" style={{color: this.props.color ? 'white' : 'black'}}>
-                  {this.props.title}
-                </Typography>
-                <Typography variant="h3" component="p" style={{color: this.props.color ? 'white' : 'black'}}>
-                  {this.props.data}
-                </Typography>
-                <Typography variant="h3" component="p" color="textSecondary" style={{color: this.props.color ? 'white' : 'black'}}>
-                  {this.props.unit}
-                </Typography>
-                {this.props.children}
-              </CardContent>
-            </Card>
-          );
+const styles = {
+  card: {
+    position: "relative",
+    width: "16.6%",
+    padding: "0.75rem",
+    "&:after": {
+      content: `''`,
+      display: "block",
+      paddingBottom: "100%"
     }
-    
-  
+  },
+  title: {
+    fontSize: "1rem",
+    color: "white"
+  },
+  data: {
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    color: "white"
+  },
+  icon: {
+    width: "auto",
+    height: "2rem",
+    fill: "white"
+  },
+  cardContent: {
+    position: "absolute",
+    bottom: 0
+  }
+};
+
+class DashboardCard extends React.Component {
+  render() {
+    const { classes } = this.props;
+    const Icon = this.props.icon;
+    return (
+      <div
+        className={classes.card}
+        style={{
+          backgroundImage: `linear-gradient(135deg,${this.props.color[0]},${
+            this.props.color[1]
+          }`,
+          width: this.props.width ? this.props.width : classes.card.width
+        }}
+      >
+        <div className={classes.cardContent}>
+          {this.props.icon && <Icon className={classes.icon} />}
+          <div className={classes.title}>{this.props.title}</div>
+          <div className={classes.data}>
+            {`${String(this.props.data)} ${this.props.unit}`
+              ? this.props.unit
+              : ""}
+          </div>
+          {this.props.children}
+        </div>
+      </div>
+    );
+  }
 }
 
 export default withStyles(styles)(DashboardCard);
